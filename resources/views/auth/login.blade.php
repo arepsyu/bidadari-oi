@@ -21,12 +21,12 @@
         }
         .login-card {
             width: 100%;
-            max-width: 440px;
+            max-width: 480px;
             border: none;
             border-radius: 18px;
             box-shadow: 0 15px 40px rgba(0,0,0,.25);
         }
-        .login-card img { width: 220px; height: 220px; object-fit: contain; }
+        .login-card img { width: 270px; height: 270px; object-fit: contain; }
         .btn-primary {
             background-color: var(--bo-primary);
             border-color: var(--bo-primary);
