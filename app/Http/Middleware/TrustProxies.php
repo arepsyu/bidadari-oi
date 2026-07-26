@@ -10,14 +10,13 @@ class TrustProxies extends Middleware
     /**
      * The trusted proxies for this application.
      *
-     * @var array<int, string>|string|null
+     * Railway (dan platform serupa) itu reverse proxy yang nanganin HTTPS,
+     * jadi kita percaya semua proxy ('*') biar header X-Forwarded-* kebaca bener.
      */
-    protected $proxies;
+    protected $proxies = '*';
 
     /**
      * The headers that should be used to detect proxies.
-     *
-     * @var int
      */
     protected $headers =
         Request::HEADER_X_FORWARDED_FOR |
