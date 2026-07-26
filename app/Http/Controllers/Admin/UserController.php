@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Opd;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -14,25 +15,19 @@ class UserController extends Controller
 {
     public function index(): View
     {
-        $users = User::orderBy('role')->orderBy('name')->paginate(15);
+        $users = User::with('opd')->orderBy('role')->orderBy('name')->paginate(15);
         return view('admin.users.index', compact('users'));
     }
 
     public function create(): View
     {
-        return view('admin.users.create');
+        $opds = Opd::orderBy('nama')->get();
+        return view('admin.users.create', compact('opds'));
     }
 
     public function store(Request $request): RedirectResponse
     {
-        $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:6'],
-            'role' => ['required', 'in:admin,user'],
-            'organisasi' => ['nullable', 'string', 'max:255'],
-        ]);
-
+        $data = $this->validated($request);
         $data['password'] = Hash::make($data['password']);
         $data['is_active'] = true;
 
@@ -43,19 +38,13 @@ class UserController extends Controller
 
     public function edit(User $user): View
     {
-        return view('admin.users.edit', compact('user'));
+        $opds = Opd::orderBy('nama')->get();
+        return view('admin.users.edit', compact('user', 'opds'));
     }
 
     public function update(Request $request, User $user): RedirectResponse
     {
-        $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'unique:users,email,' . $user->id],
-            'password' => ['nullable', 'string', 'min:6'],
-            'role' => ['required', 'in:admin,user'],
-            'organisasi' => ['nullable', 'string', 'max:255'],
-            'is_active' => ['nullable', 'boolean'],
-        ]);
+        $data = $this->validated($request, $user);
 
         if (! empty($data['password'])) {
             $data['password'] = Hash::make($data['password']);
@@ -83,5 +72,35 @@ class UserController extends Controller
         $user->delete();
 
         return redirect()->route('admin.users.index')->with('success', 'Akun berhasil dihapus.');
+    }
+
+    private function validated(Request $request, ?User $user = null): array
+    {
+        $rules = [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'unique:users,email' . ($user ? ',' . $user->id : '')],
+            'password' => [$user ? 'nullable' : 'required', 'string', 'min:6'],
+            'role' => ['required', 'in:admin,user'],
+            'kategori' => ['nullable', 'required_if:role,user', 'in:opd,kecamatan,desa'],
+            'opd_id' => ['nullable', 'required_if:kategori,opd', 'exists:opds,id'],
+            'organisasi' => ['nullable', 'string', 'max:255'],
+        ];
+
+        $data = $request->validate($rules);
+
+        // Admin gak butuh kategori/opd
+        if ($data['role'] === 'admin') {
+            $data['kategori'] = null;
+            $data['opd_id'] = null;
+        }
+
+        // Kalau kategori OPD, sinkronkan nama organisasi dengan master OPD yang dipilih
+        if (($data['kategori'] ?? null) === 'opd' && ! empty($data['opd_id'])) {
+            $data['organisasi'] = Opd::find($data['opd_id'])->nama;
+        } else {
+            $data['opd_id'] = null;
+        }
+
+        return $data;
     }
 }

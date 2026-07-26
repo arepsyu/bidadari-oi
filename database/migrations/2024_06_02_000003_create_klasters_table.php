@@ -8,19 +8,18 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('data_requirements', function (Blueprint $table) {
+        Schema::create('klasters', function (Blueprint $table) {
             $table->id();
-            $table->string('judul');
-            $table->text('deskripsi')->nullable();
-            $table->enum('tipe', ['text', 'textarea', 'number', 'date', 'file'])->default('text');
-            $table->boolean('wajib')->default(true);
+            $table->string('nama');
             $table->integer('urutan')->default(0);
+            $table->decimal('nilai_max', 8, 2)->nullable();
+            $table->decimal('nilai_evaluasi', 8, 2)->nullable();
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('data_requirements');
+        Schema::dropIfExists('klasters');
     }
 };

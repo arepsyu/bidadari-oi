@@ -11,13 +11,13 @@ return new class extends Migration
         Schema::create('submissions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('data_requirement_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('pertanyaan_id')->constrained()->cascadeOnDelete();
             $table->text('value')->nullable();
             $table->string('file_path')->nullable();
             $table->string('file_original_name')->nullable();
             $table->timestamps();
 
-            $table->unique(['user_id', 'data_requirement_id']);
+            $table->unique(['user_id', 'pertanyaan_id']);
         });
     }
 

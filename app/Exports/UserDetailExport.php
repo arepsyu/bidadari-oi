@@ -2,7 +2,6 @@
 
 namespace App\Exports;
 
-use App\Models\DataRequirement;
 use App\Models\Submission;
 use App\Models\User;
 use Maatwebsite\Excel\Concerns\FromCollection;
@@ -22,15 +21,17 @@ class UserDetailExport implements FromCollection, WithHeadings, ShouldAutoSize, 
 
     public function collection()
     {
-        $requirements = DataRequirement::orderBy('urutan')->get();
-        $submissions = Submission::where('user_id', $this->user->id)->get()->keyBy('data_requirement_id');
+        $pertanyaans = $this->user->pertanyaanRelevan()->with('indikator.klaster')->get();
+        $submissions = Submission::where('user_id', $this->user->id)->get()->keyBy('pertanyaan_id');
 
-        return $requirements->map(function ($req) use ($submissions) {
-            $sub = $submissions->get($req->id);
+        return $pertanyaans->map(function ($p) use ($submissions) {
+            $sub = $submissions->get($p->id);
             return [
-                'judul' => $req->judul,
+                'klaster' => $p->indikator->klaster->nama,
+                'indikator' => $p->indikator->nama,
+                'pertanyaan' => $p->teks,
                 'status' => $sub ? 'Sudah Diisi' : 'Belum Diisi',
-                'isi' => $sub ? ($req->tipe === 'file' ? $sub->file_original_name : $sub->value) : '-',
+                'isi' => $sub ? ($p->tipe === 'file' ? $sub->file_original_name : $sub->value) : '-',
                 'terakhir_update' => $sub?->updated_at?->format('d-m-Y H:i') ?? '-',
             ];
         });
@@ -38,7 +39,7 @@ class UserDetailExport implements FromCollection, WithHeadings, ShouldAutoSize, 
 
     public function headings(): array
     {
-        return ['Jenis Data', 'Status', 'Isi / Nama File', 'Terakhir Update'];
+        return ['Klaster', 'Indikator', 'Pertanyaan', 'Status', 'Isi / Nama File', 'Terakhir Update'];
     }
 
     public function styles(Worksheet $sheet)

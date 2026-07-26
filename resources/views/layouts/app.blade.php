@@ -19,12 +19,24 @@
         }
         .bo-sidebar {
             min-height: 100vh;
+            height: 100vh;
+            position: sticky;
+            top: 0;
             background: linear-gradient(180deg, var(--bo-primary) 0%, var(--bo-secondary) 100%);
             color: #fff;
+            overflow: hidden;
         }
         .bo-sidebar .brand {
             padding: 1.25rem 1rem;
             border-bottom: 1px solid rgba(255,255,255,.15);
+            flex-shrink: 0;
+        }
+        .bo-sidebar .nav-scroll {
+            flex: 1 1 auto;
+            overflow-y: auto;
+        }
+        .bo-sidebar .logout-area {
+            flex-shrink: 0;
         }
         .bo-sidebar .brand img { width: 42px; height: 42px; object-fit: contain; background: #fff; border-radius: 50%; padding: 3px; }
         .bo-sidebar .nav-link {
@@ -76,19 +88,22 @@
             <img src="{{ asset('images/logo.png') }}" alt="Logo">
             <div>
                 <div class="fw-bold" style="font-size: 1rem; line-height:1.1;">BIDADARI OI</div>
-                <div style="font-size:.7rem; opacity:.85;">Bank Data Kab. Layak Anak</div>
+                <div style="font-size:.65rem; opacity:.85; line-height:1.3;">Bank Informasi Data Kabupaten Layak Anak Terintegrasi Ogan Ilir</div>
             </div>
         </div>
-        <div class="nav flex-column mt-2">
+        <div class="nav flex-column mt-2 nav-scroll">
             @if(auth()->user()->isAdmin())
                 <a href="{{ route('admin.monitoring.index') }}" class="nav-link {{ request()->routeIs('admin.monitoring.*') ? 'active' : '' }}">
                     <i class="bi bi-speedometer2 me-2"></i> Dashboard Monitoring
                 </a>
                 <a href="{{ route('admin.users.index') }}" class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
-                    <i class="bi bi-people me-2"></i> Kelola Akun User
+                    <i class="bi bi-people me-2"></i> Kelola Akun
                 </a>
-                <a href="{{ route('admin.requirements.index') }}" class="nav-link {{ request()->routeIs('admin.requirements.*') ? 'active' : '' }}">
-                    <i class="bi bi-list-check me-2"></i> Kelola Jenis Data
+                <a href="{{ route('admin.pertanyaan.index') }}" class="nav-link {{ request()->routeIs('admin.pertanyaan.*') ? 'active' : '' }}">
+                    <i class="bi bi-list-check me-2"></i> Kelola Pertanyaan KLA
+                </a>
+                <a href="{{ route('admin.opd.index') }}" class="nav-link {{ request()->routeIs('admin.opd.*') ? 'active' : '' }}">
+                    <i class="bi bi-building me-2"></i> Kelola Master OPD
                 </a>
             @else
                 <a href="{{ route('user.submissions.index') }}" class="nav-link {{ request()->routeIs('user.submissions.*') ? 'active' : '' }}">
@@ -96,7 +111,7 @@
                 </a>
             @endif
         </div>
-        <div class="mt-auto p-3">
+        <div class="p-3 logout-area">
             <form action="{{ route('logout') }}" method="POST">
                 @csrf
                 <button class="btn btn-sm btn-light w-100" type="submit">

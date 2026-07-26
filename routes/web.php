@@ -1,7 +1,8 @@
 <?php
 
-use App\Http\Controllers\Admin\DataRequirementController;
 use App\Http\Controllers\Admin\MonitoringController;
+use App\Http\Controllers\Admin\OpdController;
+use App\Http\Controllers\Admin\PertanyaanController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\DashboardController;
@@ -22,10 +23,10 @@ Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->n
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Area User
+    // Area User (OPD / Kecamatan / Desa)
     Route::prefix('data-saya')->name('user.')->group(function () {
         Route::get('/', [SubmissionController::class, 'index'])->name('submissions.index');
-        Route::post('/{requirement}', [SubmissionController::class, 'store'])->name('submissions.store');
+        Route::post('/{pertanyaan}', [SubmissionController::class, 'store'])->name('submissions.store');
     });
 
     // Area Admin
@@ -38,6 +39,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/monitoring/{user}/export/pdf', [MonitoringController::class, 'exportUserPdf'])->name('monitoring.export.user-pdf');
 
         Route::resource('users', UserController::class)->except(['show']);
-        Route::resource('requirements', DataRequirementController::class)->except(['show']);
+        Route::resource('pertanyaan', PertanyaanController::class)->except(['show']);
+
+        Route::get('/opd', [OpdController::class, 'index'])->name('opd.index');
+        Route::post('/opd', [OpdController::class, 'store'])->name('opd.store');
+        Route::put('/opd/{opd}', [OpdController::class, 'update'])->name('opd.update');
+        Route::delete('/opd/{opd}', [OpdController::class, 'destroy'])->name('opd.destroy');
     });
 });

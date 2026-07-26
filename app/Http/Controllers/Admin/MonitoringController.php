@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Exports\MonitoringExport;
 use App\Exports\UserDetailExport;
 use App\Http\Controllers\Controller;
-use App\Models\DataRequirement;
+use App\Models\Pertanyaan;
 use App\Models\Submission;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -18,59 +18,58 @@ class MonitoringController extends Controller
     public function index(): View
     {
         $totalUsers = User::where('role', 'user')->count();
-        $totalRequirements = DataRequirement::count();
+        $totalPertanyaan = Pertanyaan::count();
         $totalSubmissions = Submission::count();
 
-        $targetSubmissions = $totalUsers * max($totalRequirements, 1);
-        $completionRate = $targetSubmissions > 0
-            ? round(($totalSubmissions / $targetSubmissions) * 100)
-            : 0;
-
         $users = User::where('role', 'user')
+            ->with('opd')
             ->withCount('submissions')
             ->orderBy('name')
             ->get()
-            ->map(function ($user) use ($totalRequirements) {
-                $user->progress = $totalRequirements > 0
-                    ? round(($user->submissions_count / $totalRequirements) * 100)
+            ->map(function ($user) {
+                $relevanCount = $user->pertanyaanRelevan()->count();
+                $user->relevan_count = $relevanCount;
+                $user->progress = $relevanCount > 0
+                    ? round(($user->submissions_count / $relevanCount) * 100)
                     : 0;
                 return $user;
             });
 
-        // Data untuk chart batang: kelengkapan per jenis data
-        $requirementStats = DataRequirement::withCount('submissions')
-            ->orderBy('urutan')
-            ->get()
-            ->map(function ($req) use ($totalUsers) {
-                $req->percentage = $totalUsers > 0
-                    ? round(($req->submissions_count / $totalUsers) * 100)
-                    : 0;
-                return $req;
-            });
+        $targetTotal = $users->sum('relevan_count');
+        $isiTotal = $users->sum('submissions_count');
+        $completionRate = $targetTotal > 0 ? round(($isiTotal / $targetTotal) * 100) : 0;
 
         $belumLengkap = $users->where('progress', '<', 100)->count();
         $sudahLengkap = $users->where('progress', '>=', 100)->count();
 
+        // Kelengkapan per kategori (OPD / Kecamatan / Desa)
+        $perKategori = $users->groupBy('kategori')->map(function ($grup) {
+            return [
+                'jumlah_akun' => $grup->count(),
+                'rata_progress' => $grup->count() > 0 ? round($grup->avg('progress')) : 0,
+            ];
+        });
+
         return view('admin.monitoring.index', compact(
             'totalUsers',
-            'totalRequirements',
+            'totalPertanyaan',
             'totalSubmissions',
             'completionRate',
             'users',
-            'requirementStats',
             'belumLengkap',
-            'sudahLengkap'
+            'sudahLengkap',
+            'perKategori'
         ));
     }
 
     public function show(User $user): View
     {
-        $requirements = DataRequirement::orderBy('urutan')->get();
-        $submissions = Submission::where('user_id', $user->id)
-            ->get()
-            ->keyBy('data_requirement_id');
+        $pertanyaans = $user->pertanyaanRelevan()->with('indikator.klaster')->get()
+            ->groupBy(fn ($p) => $p->indikator->klaster->nama . '|' . $p->indikator->nama);
 
-        return view('admin.monitoring.show', compact('user', 'requirements', 'submissions'));
+        $submissions = Submission::where('user_id', $user->id)->get()->keyBy('pertanyaan_id');
+
+        return view('admin.monitoring.show', compact('user', 'pertanyaans', 'submissions'));
     }
 
     public function exportExcel(): \Symfony\Component\HttpFoundation\BinaryFileResponse
@@ -81,21 +80,20 @@ class MonitoringController extends Controller
 
     public function exportPdf(): Response
     {
-        $totalRequirements = DataRequirement::count();
-
         $users = User::where('role', 'user')
             ->withCount('submissions')
             ->orderBy('name')
             ->get()
-            ->map(function ($user) use ($totalRequirements) {
-                $user->progress = $totalRequirements > 0
-                    ? round(($user->submissions_count / $totalRequirements) * 100)
+            ->map(function ($user) {
+                $relevanCount = $user->pertanyaanRelevan()->count();
+                $user->relevan_count = $relevanCount;
+                $user->progress = $relevanCount > 0
+                    ? round(($user->submissions_count / $relevanCount) * 100)
                     : 0;
                 return $user;
             });
 
-        $pdf = Pdf::loadView('admin.monitoring.pdf', compact('users', 'totalRequirements'))
-            ->setPaper('a4', 'landscape');
+        $pdf = Pdf::loadView('admin.monitoring.pdf', compact('users'))->setPaper('a4', 'landscape');
 
         return $pdf->download('monitoring-bidadari-oi-' . now()->format('Ymd_His') . '.pdf');
     }
@@ -108,10 +106,12 @@ class MonitoringController extends Controller
 
     public function exportUserPdf(User $user): Response
     {
-        $requirements = DataRequirement::orderBy('urutan')->get();
-        $submissions = Submission::where('user_id', $user->id)->get()->keyBy('data_requirement_id');
+        $pertanyaans = $user->pertanyaanRelevan()->with('indikator.klaster')->get()
+            ->groupBy(fn ($p) => $p->indikator->klaster->nama . '|' . $p->indikator->nama);
 
-        $pdf = Pdf::loadView('admin.monitoring.pdf_detail', compact('user', 'requirements', 'submissions'))
+        $submissions = Submission::where('user_id', $user->id)->get()->keyBy('pertanyaan_id');
+
+        $pdf = Pdf::loadView('admin.monitoring.pdf_detail', compact('user', 'pertanyaans', 'submissions'))
             ->setPaper('a4', 'portrait');
 
         $filename = 'data-' . str($user->organisasi ?? $user->name)->slug() . '.pdf';

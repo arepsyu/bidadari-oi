@@ -11,7 +11,7 @@ class Submission extends Model
 
     protected $fillable = [
         'user_id',
-        'data_requirement_id',
+        'pertanyaan_id',
         'value',
         'file_path',
         'file_original_name',
@@ -22,8 +22,8 @@ class Submission extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function dataRequirement()
+    public function pertanyaan()
     {
-        return $this->belongsTo(DataRequirement::class);
+        return $this->belongsTo(Pertanyaan::class);
     }
 }

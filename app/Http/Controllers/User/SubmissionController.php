@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
-use App\Models\DataRequirement;
+use App\Models\Pertanyaan;
 use App\Models\Submission;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,27 +15,41 @@ class SubmissionController extends Controller
 {
     public function index(): View
     {
-        $requirements = DataRequirement::orderBy('urutan')->orderBy('id')->get();
-        $submissions = Submission::where('user_id', Auth::id())
-            ->get()
-            ->keyBy('data_requirement_id');
+        $user = Auth::user();
 
+        $pertanyaans = $user->pertanyaanRelevan()
+            ->with('indikator.klaster')
+            ->get()
+            ->sortBy([
+                fn ($p) => $p->indikator->klaster->urutan,
+                fn ($p) => $p->indikator->urutan,
+                fn ($p) => $p->urutan,
+            ])
+            ->groupBy(fn ($p) => $p->indikator->klaster->id . '|' . $p->indikator->klaster->nama);
+
+        $submissions = Submission::where('user_id', $user->id)->get()->keyBy('pertanyaan_id');
+
+        $total = $user->pertanyaanRelevan()->count();
         $filled = $submissions->count();
-        $total = $requirements->count();
         $progress = $total > 0 ? round(($filled / $total) * 100) : 0;
 
-        return view('user.dashboard', compact('requirements', 'submissions', 'filled', 'total', 'progress'));
+        return view('user.dashboard', compact('pertanyaans', 'submissions', 'filled', 'total', 'progress'));
     }
 
-    public function store(Request $request, DataRequirement $requirement): RedirectResponse
+    public function store(Request $request, Pertanyaan $pertanyaan): RedirectResponse
     {
+        // Pastikan pertanyaan ini memang relevan buat user yang login (jaga-jaga akses langsung)
+        if (! $pertanyaan->isVisibleFor(Auth::user())) {
+            abort(403);
+        }
+
         $rules = [];
 
-        if ($requirement->tipe === 'file') {
+        if ($pertanyaan->tipe === 'file') {
             $rules['file'] = ['required', 'file', 'max:10240', 'mimes:pdf,jpg,jpeg,png,doc,docx,xls,xlsx'];
-        } elseif ($requirement->tipe === 'number') {
+        } elseif ($pertanyaan->tipe === 'number') {
             $rules['value'] = ['required', 'numeric'];
-        } elseif ($requirement->tipe === 'date') {
+        } elseif ($pertanyaan->tipe === 'date') {
             $rules['value'] = ['required', 'date'];
         } else {
             $rules['value'] = ['required', 'string'];
@@ -45,10 +59,10 @@ class SubmissionController extends Controller
 
         $submission = Submission::firstOrNew([
             'user_id' => Auth::id(),
-            'data_requirement_id' => $requirement->id,
+            'pertanyaan_id' => $pertanyaan->id,
         ]);
 
-        if ($requirement->tipe === 'file' && $request->hasFile('file')) {
+        if ($pertanyaan->tipe === 'file' && $request->hasFile('file')) {
             if ($submission->file_path) {
                 Storage::disk('public')->delete($submission->file_path);
             }
@@ -61,9 +75,9 @@ class SubmissionController extends Controller
         }
 
         $submission->user_id = Auth::id();
-        $submission->data_requirement_id = $requirement->id;
+        $submission->pertanyaan_id = $pertanyaan->id;
         $submission->save();
 
-        return back()->with('success', 'Data "' . $requirement->judul . '" berhasil disimpan.');
+        return back()->with('success', 'Data berhasil disimpan.');
     }
 }

@@ -16,8 +16,9 @@
                 <tr>
                     <th class="ps-3">Nama</th>
                     <th>Email</th>
-                    <th>Organisasi</th>
                     <th>Role</th>
+                    <th>Kategori</th>
+                    <th>Organisasi</th>
                     <th>Status</th>
                     <th class="text-end pe-3">Aksi</th>
                 </tr>
@@ -27,12 +28,13 @@
                 <tr>
                     <td class="ps-3">{{ $user->name }}</td>
                     <td>{{ $user->email }}</td>
-                    <td>{{ $user->organisasi ?? '-' }}</td>
                     <td>
                         <span class="badge {{ $user->role === 'admin' ? 'bg-primary' : 'bg-secondary' }}">
                             {{ ucfirst($user->role) }}
                         </span>
                     </td>
+                    <td>{{ $user->role === 'user' ? $user->kategoriLabel() : '-' }}</td>
+                    <td>{{ $user->organisasi ?? '-' }}</td>
                     <td>
                         @if($user->is_active)
                             <span class="badge bg-success">Aktif</span>
@@ -54,7 +56,7 @@
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="6" class="text-center py-4 text-muted">Belum ada akun.</td></tr>
+                <tr><td colspan="7" class="text-center py-4 text-muted">Belum ada akun.</td></tr>
                 @endforelse
             </tbody>
         </table>

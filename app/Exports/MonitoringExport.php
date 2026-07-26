@@ -2,7 +2,6 @@
 
 namespace App\Exports;
 
-use App\Models\DataRequirement;
 use App\Models\User;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
@@ -13,13 +12,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class MonitoringExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize, WithStyles
 {
-    protected int $totalRequirements;
     protected int $no = 0;
-
-    public function __construct()
-    {
-        $this->totalRequirements = DataRequirement::count();
-    }
 
     public function collection()
     {
@@ -31,24 +24,26 @@ class MonitoringExport implements FromCollection, WithHeadings, WithMapping, Sho
 
     public function headings(): array
     {
-        return ['No', 'Organisasi', 'Nama User', 'Email', 'Data Terisi', 'Total Data', 'Persentase (%)'];
+        return ['No', 'Kategori', 'Organisasi', 'Nama User', 'Email', 'Data Terisi', 'Total Data Relevan', 'Persentase (%)'];
     }
 
     public function map($user): array
     {
         $this->no++;
 
-        $percentage = $this->totalRequirements > 0
-            ? round(($user->submissions_count / $this->totalRequirements) * 100)
+        $totalRelevan = $user->pertanyaanRelevan()->count();
+        $percentage = $totalRelevan > 0
+            ? round(($user->submissions_count / $totalRelevan) * 100)
             : 0;
 
         return [
             $this->no,
+            $user->kategoriLabel(),
             $user->organisasi ?? '-',
             $user->name,
             $user->email,
             $user->submissions_count,
-            $this->totalRequirements,
+            $totalRelevan,
             $percentage,
         ];
     }

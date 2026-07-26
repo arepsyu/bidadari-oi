@@ -14,61 +14,64 @@
     </div>
 </div>
 
-@forelse($requirements as $req)
-    @php $sub = $submissions->get($req->id); @endphp
+@forelse($pertanyaans as $klasterKey => $groupByKlaster)
+    @php $klasterNama = explode('|', $klasterKey)[1]; @endphp
     <div class="card mb-3">
+        <div class="card-header bg-white fw-bold text-bo-primary">
+            {{ $klasterNama }}
+        </div>
         <div class="card-body">
-            <div class="d-flex justify-content-between align-items-start mb-2">
-                <div>
-                    <h6 class="fw-bold mb-1">
-                        {{ $req->judul }}
-                        @if($req->wajib)<span class="badge badge-wajib">Wajib</span>@endif
-                    </h6>
-                    @if($req->deskripsi)
-                        <div class="small text-muted mb-2">{{ $req->deskripsi }}</div>
-                    @endif
-                </div>
-                <div>
-                    @if($sub)
-                        <span class="badge bg-success"><i class="bi bi-check-circle"></i> Terisi</span>
-                    @else
-                        <span class="badge bg-danger">Belum Diisi</span>
-                    @endif
-                </div>
-            </div>
-
-            <form method="POST" action="{{ route('user.submissions.store', $req) }}" enctype="multipart/form-data" class="row g-2 align-items-end">
-                @csrf
-                <div class="col-md-8">
-                    @if($req->tipe === 'file')
-                        <input type="file" name="file" class="form-control">
-                        @if($sub && $sub->file_path)
-                            <div class="small mt-1">
-                                File saat ini:
-                                <a href="{{ asset('storage/' . $sub->file_path) }}" target="_blank">{{ $sub->file_original_name }}</a>
+            @foreach($groupByKlaster->groupBy(fn($p) => $p->indikator->nama) as $indikatorNama => $listPertanyaan)
+                <div class="mb-3">
+                    <h6 class="fw-semibold mb-2">{{ $indikatorNama }}</h6>
+                    @foreach($listPertanyaan as $p)
+                        @php $sub = $submissions->get($p->id); @endphp
+                        <div class="border rounded p-3 mb-2">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div class="small">{{ $p->teks }}</div>
+                                <div class="ms-2">
+                                    @if($sub)
+                                        <span class="badge bg-success"><i class="bi bi-check-circle"></i> Terisi</span>
+                                    @else
+                                        <span class="badge bg-danger">Belum</span>
+                                    @endif
+                                </div>
                             </div>
-                        @endif
-                    @elseif($req->tipe === 'textarea')
-                        <textarea name="value" class="form-control" rows="2">{{ $sub->value ?? '' }}</textarea>
-                    @elseif($req->tipe === 'date')
-                        <input type="date" name="value" class="form-control" value="{{ $sub->value ?? '' }}">
-                    @elseif($req->tipe === 'number')
-                        <input type="number" name="value" class="form-control" value="{{ $sub->value ?? '' }}">
-                    @else
-                        <input type="text" name="value" class="form-control" value="{{ $sub->value ?? '' }}">
-                    @endif
-                    @error('value') <div class="text-danger small">{{ $message }}</div> @enderror
-                    @error('file') <div class="text-danger small">{{ $message }}</div> @enderror
+
+                            <form method="POST" action="{{ route('user.submissions.store', $p) }}" enctype="multipart/form-data" class="row g-2 align-items-end">
+                                @csrf
+                                <div class="col-md-8">
+                                    @if($p->tipe === 'file')
+                                        <input type="file" name="file" class="form-control form-control-sm">
+                                        @if($sub && $sub->file_path)
+                                            <div class="small mt-1">
+                                                File saat ini:
+                                                <a href="{{ asset('storage/' . $sub->file_path) }}" target="_blank">{{ $sub->file_original_name }}</a>
+                                            </div>
+                                        @endif
+                                    @elseif($p->tipe === 'textarea')
+                                        <textarea name="value" class="form-control form-control-sm" rows="2">{{ $sub->value ?? '' }}</textarea>
+                                    @elseif($p->tipe === 'date')
+                                        <input type="date" name="value" class="form-control form-control-sm" value="{{ $sub->value ?? '' }}">
+                                    @elseif($p->tipe === 'number')
+                                        <input type="number" name="value" class="form-control form-control-sm" value="{{ $sub->value ?? '' }}">
+                                    @else
+                                        <input type="text" name="value" class="form-control form-control-sm" value="{{ $sub->value ?? '' }}">
+                                    @endif
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="submit" class="btn btn-sm btn-accent w-100">
+                                        <i class="bi bi-cloud-upload"></i> Simpan
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    @endforeach
                 </div>
-                <div class="col-md-4">
-                    <button type="submit" class="btn btn-accent w-100">
-                        <i class="bi bi-cloud-upload"></i> Simpan
-                    </button>
-                </div>
-            </form>
+            @endforeach
         </div>
     </div>
 @empty
-    <div class="text-center text-muted py-5">Belum ada jenis data yang ditentukan oleh admin.</div>
+    <div class="text-center text-muted py-5">Belum ada pertanyaan yang ditugaskan untuk akun Anda. Hubungi admin.</div>
 @endforelse
 @endsection

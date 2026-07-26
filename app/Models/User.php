@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -16,6 +15,8 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'kategori',
+        'opd_id',
         'organisasi',
         'is_active',
     ];
@@ -34,6 +35,11 @@ class User extends Authenticatable
         ];
     }
 
+    public function opd()
+    {
+        return $this->belongsTo(Opd::class);
+    }
+
     public function submissions()
     {
         return $this->hasMany(Submission::class);
@@ -42,5 +48,52 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
+    }
+
+    public function isOpd(): bool
+    {
+        return $this->kategori === 'opd';
+    }
+
+    public function isKecamatan(): bool
+    {
+        return $this->kategori === 'kecamatan';
+    }
+
+    public function isDesa(): bool
+    {
+        return $this->kategori === 'desa';
+    }
+
+    public function kategoriLabel(): string
+    {
+        return match ($this->kategori) {
+            'opd' => 'OPD/Dinas',
+            'kecamatan' => 'Kecamatan',
+            'desa' => 'Desa',
+            default => '-',
+        };
+    }
+
+    /**
+     * Ambil semua pertanyaan yang relevan buat user ini sesuai kategori akunnya.
+     */
+    public function pertanyaanRelevan()
+    {
+        if ($this->kategori === 'kecamatan') {
+            return Pertanyaan::where('untuk_kecamatan', true);
+        }
+
+        if ($this->kategori === 'desa') {
+            return Pertanyaan::where('untuk_desa', true);
+        }
+
+        if ($this->kategori === 'opd' && $this->opd_id) {
+            return Pertanyaan::whereHas('opds', function ($q) {
+                $q->where('opds.id', $this->opd_id);
+            });
+        }
+
+        return Pertanyaan::whereRaw('1 = 0');
     }
 }

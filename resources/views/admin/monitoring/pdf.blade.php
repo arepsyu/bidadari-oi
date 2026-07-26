@@ -27,11 +27,12 @@
         <thead>
             <tr>
                 <th class="text-center">No</th>
+                <th>Kategori</th>
                 <th>Organisasi</th>
                 <th>Nama User</th>
                 <th>Email</th>
                 <th class="text-center">Data Terisi</th>
-                <th class="text-center">Total Data</th>
+                <th class="text-center">Total Relevan</th>
                 <th class="text-center">Persentase</th>
             </tr>
         </thead>
@@ -39,15 +40,16 @@
             @forelse($users as $i => $user)
             <tr>
                 <td class="text-center">{{ $i + 1 }}</td>
+                <td>{{ $user->kategoriLabel() }}</td>
                 <td>{{ $user->organisasi ?? '-' }}</td>
                 <td>{{ $user->name }}</td>
                 <td>{{ $user->email }}</td>
                 <td class="text-center">{{ $user->submissions_count }}</td>
-                <td class="text-center">{{ $totalRequirements }}</td>
+                <td class="text-center">{{ $user->relevan_count }}</td>
                 <td class="text-center">{{ $user->progress }}%</td>
             </tr>
             @empty
-            <tr><td colspan="7" class="text-center">Belum ada data user.</td></tr>
+            <tr><td colspan="8" class="text-center">Belum ada data user.</td></tr>
             @endforelse
         </tbody>
     </table>
