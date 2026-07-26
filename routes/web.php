@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\VerificationController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DeployController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\User\SubmissionController;
 use Illuminate\Support\Facades\Route;
 
@@ -34,6 +35,10 @@ Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->n
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Ganti password (buat semua role: admin, opd, kecamatan, desa)
+    Route::get('/ganti-password', [ProfileController::class, 'editPassword'])->name('profile.password.edit');
+    Route::put('/ganti-password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
 
     // Area User (OPD / Kecamatan / Desa)
     Route::prefix('data-saya')->name('user.')->group(function () {

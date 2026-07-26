@@ -112,6 +112,9 @@
             @endif
         </div>
         <div class="p-3 logout-area">
+            <a href="{{ route('profile.password.edit') }}" class="btn btn-sm btn-outline-light w-100 mb-2">
+                <i class="bi bi-key"></i> Ganti Password
+            </a>
             <form action="{{ route('logout') }}" method="POST">
                 @csrf
                 <button class="btn btn-sm btn-light w-100" type="submit">
