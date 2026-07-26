@@ -21,12 +21,12 @@
         }
         .login-card {
             width: 100%;
-            max-width: 400px;
+            max-width: 440px;
             border: none;
             border-radius: 18px;
             box-shadow: 0 15px 40px rgba(0,0,0,.25);
         }
-        .login-card img { width: 90px; height: 90px; object-fit: contain; }
+        .login-card img { width: 220px; height: 220px; object-fit: contain; }
         .btn-primary {
             background-color: var(--bo-primary);
             border-color: var(--bo-primary);
@@ -41,8 +41,6 @@
     <div class="card login-card p-4">
         <div class="text-center mb-3">
             <img src="{{ asset('images/logo.png') }}" alt="Logo BIDADARI OI">
-            <h5 class="fw-bold mt-2 mb-0" style="color: var(--bo-primary);">BIDADARI OI</h5>
-            <div class="small text-muted">Bank Informasi Data Kabupaten Layak Anak Terintegrasi Ogan Ilir</div>
         </div>
 
         @if ($errors->any())
