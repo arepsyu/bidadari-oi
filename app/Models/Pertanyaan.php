@@ -10,12 +10,13 @@ class Pertanyaan extends Model
     use HasFactory;
 
     protected $fillable = [
-        'indikator_id', 'kode', 'teks', 'tipe', 'nilai_max', 'nilai_evaluasi',
+        'indikator_id', 'kode', 'teks', 'tipe', 'wajib_lampiran', 'nilai_max', 'nilai_evaluasi',
         'wajib', 'untuk_kecamatan', 'untuk_desa', 'urutan',
     ];
 
     protected $casts = [
         'wajib' => 'boolean',
+        'wajib_lampiran' => 'boolean',
         'untuk_kecamatan' => 'boolean',
         'untuk_desa' => 'boolean',
     ];

@@ -32,7 +32,7 @@ class UserDetailExport implements FromCollection, WithHeadings, ShouldAutoSize, 
                 'pertanyaan' => $p->teks,
                 'status' => $sub ? 'Sudah Diisi' : 'Belum Diisi',
                 'status_verifikasi' => $sub ? $sub->statusLabel() : '-',
-                'isi' => $sub ? ($p->tipe === 'file' ? $sub->file_original_name : $sub->value) : '-',
+                'isi' => $sub ? trim(($sub->value ?? '') . ((($p->tipe === 'file' || $p->wajib_lampiran) && $sub->file_path) ? ' [' . $sub->file_original_name . ']' : '')) ?: '-' : '-',
                 'terakhir_update' => $sub?->updated_at?->format('d-m-Y H:i') ?? '-',
             ];
         });

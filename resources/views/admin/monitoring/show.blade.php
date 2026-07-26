@@ -57,13 +57,15 @@
                                 @endif
                             </td>
                             <td>
-                                @if($sub && $p->tipe === 'file' && $sub->file_path)
+                                @if($sub && $sub->value)
+                                    <div>{{ \Illuminate\Support\Str::limit($sub->value, 40) }}</div>
+                                @endif
+                                @if($sub && ($p->tipe === 'file' || $p->wajib_lampiran) && $sub->file_path)
                                     <a href="{{ asset($sub->file_path) }}" target="_blank">
                                         <i class="bi bi-file-earmark-arrow-down"></i> {{ \Illuminate\Support\Str::limit($sub->file_original_name, 25) }}
                                     </a>
-                                @elseif($sub)
-                                    {{ \Illuminate\Support\Str::limit($sub->value, 40) }}
-                                @else
+                                @endif
+                                @if(!$sub)
                                     <span class="text-muted">-</span>
                                 @endif
                                 @if($sub && $sub->histories->count() > 0)

@@ -51,7 +51,12 @@
                             @if($sub)<span class="badge-ok">{{ $sub->statusLabel() }}</span>@else<span class="badge-no">Belum Diisi</span>@endif
                         </td>
                         <td>
-                            @if($sub){{ $p->tipe === 'file' ? $sub->file_original_name : $sub->value }}@else - @endif
+                            @if($sub)
+                                @if($sub->value){{ $sub->value }}@endif
+                                @if(($p->tipe === 'file' || $p->wajib_lampiran) && $sub->file_path)
+                                    {{ $sub->value ? ' | ' : '' }}{{ $sub->file_original_name }}
+                                @endif
+                            @else - @endif
                         </td>
                     </tr>
                 @endforeach

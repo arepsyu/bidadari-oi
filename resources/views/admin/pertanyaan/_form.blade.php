@@ -49,6 +49,18 @@
     <label class="form-check-label" for="wajib">Wajib diisi</label>
 </div>
 
+<div class="form-check form-switch mb-3">
+    <input type="checkbox" name="wajib_lampiran" class="form-check-input" id="wajib_lampiran" value="1" {{ old('wajib_lampiran', $pertanyaan->wajib_lampiran ?? false) ? 'checked' : '' }}>
+    <label class="form-check-label" for="wajib_lampiran">
+        Butuh lampiran dokumen tambahan juga
+    </label>
+    <div class="form-text">
+        Aktifkan kalau pertanyaan ini butuh 2 jawaban sekaligus — misal jawaban teks/angka
+        DITAMBAH upload dokumen pendukung (matriks, dll). Gak berlaku kalau Tipe Input di atas
+        udah "Upload File".
+    </div>
+</div>
+
 <hr>
 <label class="form-label fw-semibold">Siapa yang harus mengisi pertanyaan ini?</label>
 

@@ -52,6 +52,7 @@ class PertanyaanController extends Controller
             'kode' => ['nullable', 'string', 'max:100'],
             'teks' => ['required', 'string'],
             'tipe' => ['required', 'in:text,textarea,number,date,file'],
+            'wajib_lampiran' => ['nullable', 'boolean'],
             'wajib' => ['nullable', 'boolean'],
             'untuk_kecamatan' => ['nullable', 'boolean'],
             'untuk_desa' => ['nullable', 'boolean'],
@@ -61,6 +62,7 @@ class PertanyaanController extends Controller
         ]);
 
         $data['wajib'] = $request->boolean('wajib');
+        $data['wajib_lampiran'] = $request->boolean('wajib_lampiran');
         $data['untuk_kecamatan'] = $request->boolean('untuk_kecamatan');
         $data['untuk_desa'] = $request->boolean('untuk_desa');
         $data['urutan'] = $data['urutan'] ?? 0;
@@ -90,6 +92,7 @@ class PertanyaanController extends Controller
             'kode' => ['nullable', 'string', 'max:100'],
             'teks' => ['required', 'string'],
             'tipe' => ['required', 'in:text,textarea,number,date,file'],
+            'wajib_lampiran' => ['nullable', 'boolean'],
             'wajib' => ['nullable', 'boolean'],
             'untuk_kecamatan' => ['nullable', 'boolean'],
             'untuk_desa' => ['nullable', 'boolean'],
@@ -99,6 +102,7 @@ class PertanyaanController extends Controller
         ]);
 
         $data['wajib'] = $request->boolean('wajib');
+        $data['wajib_lampiran'] = $request->boolean('wajib_lampiran');
         $data['untuk_kecamatan'] = $request->boolean('untuk_kecamatan');
         $data['untuk_desa'] = $request->boolean('untuk_desa');
 

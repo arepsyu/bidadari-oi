@@ -28,7 +28,14 @@
                         @php $sub = $submissions->get($p->id); @endphp
                         <div class="border rounded p-3 mb-2">
                             <div class="d-flex justify-content-between align-items-start mb-2">
-                                <div class="small">{{ $p->teks }}</div>
+                                <div class="small">
+                                    {{ $p->teks }}
+                                    @if($p->wajib_lampiran)
+                                        <span class="badge bg-info-subtle text-dark border ms-1">
+                                            <i class="bi bi-files"></i> Butuh isian + lampiran
+                                        </span>
+                                    @endif
+                                </div>
                                 <div class="ms-2">
                                     @if($sub)
                                         <span class="badge {{ $sub->statusBadgeClass() }}">{{ $sub->statusLabel() }}</span>
@@ -56,14 +63,29 @@
                                                 <a href="{{ asset($sub->file_path) }}" target="_blank">{{ $sub->file_original_name }}</a>
                                             </div>
                                         @endif
-                                    @elseif($p->tipe === 'textarea')
-                                        <textarea name="value" class="form-control form-control-sm" rows="2">{{ $sub->value ?? '' }}</textarea>
-                                    @elseif($p->tipe === 'date')
-                                        <input type="date" name="value" class="form-control form-control-sm" value="{{ $sub->value ?? '' }}">
-                                    @elseif($p->tipe === 'number')
-                                        <input type="number" name="value" class="form-control form-control-sm" value="{{ $sub->value ?? '' }}">
                                     @else
-                                        <input type="text" name="value" class="form-control form-control-sm" value="{{ $sub->value ?? '' }}">
+                                        @if($p->tipe === 'textarea')
+                                            <textarea name="value" class="form-control form-control-sm" rows="2">{{ $sub->value ?? '' }}</textarea>
+                                        @elseif($p->tipe === 'date')
+                                            <input type="date" name="value" class="form-control form-control-sm" value="{{ $sub->value ?? '' }}">
+                                        @elseif($p->tipe === 'number')
+                                            <input type="number" name="value" class="form-control form-control-sm" value="{{ $sub->value ?? '' }}">
+                                        @else
+                                            <input type="text" name="value" class="form-control form-control-sm" value="{{ $sub->value ?? '' }}">
+                                        @endif
+
+                                        @if($p->wajib_lampiran)
+                                            <label class="form-label small fw-semibold mt-2 mb-1">
+                                                <i class="bi bi-paperclip"></i> Upload Dokumen Pendukung (Matriks, dll)
+                                            </label>
+                                            <input type="file" name="file" class="form-control form-control-sm">
+                                            @if($sub && $sub->file_path)
+                                                <div class="small mt-1">
+                                                    File saat ini:
+                                                    <a href="{{ asset($sub->file_path) }}" target="_blank">{{ $sub->file_original_name }}</a>
+                                                </div>
+                                            @endif
+                                        @endif
                                     @endif
                                 </div>
                                 <div class="col-md-4">

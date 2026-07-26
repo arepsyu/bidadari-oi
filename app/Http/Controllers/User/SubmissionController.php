@@ -46,6 +46,7 @@ class SubmissionController extends Controller
 
         $rules = [];
         $maxKb = (int) env('UPLOAD_MAX_KB', 10240);
+        $butuhLampiranTambahan = $pertanyaan->tipe !== 'file' && $pertanyaan->wajib_lampiran;
 
         if ($pertanyaan->tipe === 'file') {
             $rules['file'] = ['required', 'file', 'max:' . $maxKb, 'mimes:pdf,jpg,jpeg,png,doc,docx,xls,xlsx'];
@@ -55,6 +56,11 @@ class SubmissionController extends Controller
             $rules['value'] = ['required', 'date'];
         } else {
             $rules['value'] = ['required', 'string'];
+        }
+
+        // Pertanyaan tipe campuran: selain jawaban di atas, wajib juga upload dokumen pendukung
+        if ($butuhLampiranTambahan) {
+            $rules['file'] = ['required', 'file', 'max:' . $maxKb, 'mimes:pdf,jpg,jpeg,png,doc,docx,xls,xlsx'];
         }
 
         $validated = $request->validate($rules);
@@ -77,7 +83,13 @@ class SubmissionController extends Controller
             ]);
         }
 
-        if ($pertanyaan->tipe === 'file' && $request->hasFile('file')) {
+        // Simpan jawaban teks/angka/tanggal (kalau tipe-nya bukan murni file)
+        if ($pertanyaan->tipe !== 'file') {
+            $submission->value = $validated['value'] ?? null;
+        }
+
+        // Simpan file (kalau tipe-nya file, ATAU pertanyaan campuran yang butuh lampiran tambahan)
+        if (($pertanyaan->tipe === 'file' || $butuhLampiranTambahan) && $request->hasFile('file')) {
             // Simpan langsung ke public/uploads/submissions (TANPA symlink storage:link),
             // supaya kompatibel di hosting yang gak dukung symlink (misal InfinityFree).
             // Catatan: file versi lama SENGAJA gak dihapus dari disk, biar link riwayat lama masih bisa dibuka.
@@ -93,8 +105,6 @@ class SubmissionController extends Controller
 
             $submission->file_path = 'uploads/submissions/' . $filename;
             $submission->file_original_name = $file->getClientOriginalName();
-        } else {
-            $submission->value = $validated['value'] ?? null;
         }
 
         // Data berubah = perlu diverifikasi ulang oleh admin

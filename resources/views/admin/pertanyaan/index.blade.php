@@ -46,6 +46,7 @@
                     <td style="max-width: 320px;">
                         <div class="small">{{ \Illuminate\Support\Str::limit($p->teks, 120) }}</div>
                         @if($p->wajib)<span class="badge badge-wajib">Wajib</span>@endif
+                        @if($p->wajib_lampiran)<span class="badge bg-info-subtle text-dark border">+ Lampiran</span>@endif
                     </td>
                     <td><span class="badge bg-info-subtle text-dark border">{{ strtoupper($p->tipe) }}</span></td>
                     <td style="max-width: 200px;">
