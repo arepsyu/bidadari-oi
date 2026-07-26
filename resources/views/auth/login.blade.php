@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - BIDADARI OI</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <style>
         :root {
             --bo-primary: #005093;
@@ -59,7 +60,12 @@
             </div>
             <div class="mb-3">
                 <label class="form-label">Password</label>
-                <input type="password" name="password" class="form-control" required>
+                <div class="input-group">
+                    <input type="password" name="password" id="password" class="form-control" required>
+                    <button type="button" class="btn btn-outline-secondary" id="togglePassword">
+                        <i class="bi bi-eye" id="toggleIcon"></i>
+                    </button>
+                </div>
             </div>
             <div class="form-check mb-3">
                 <input type="checkbox" name="remember" class="form-check-input" id="remember">
@@ -68,5 +74,15 @@
             <button type="submit" class="btn btn-primary w-100">Masuk</button>
         </form>
     </div>
+    <script>
+        document.getElementById('togglePassword').addEventListener('click', function () {
+            const input = document.getElementById('password');
+            const icon = document.getElementById('toggleIcon');
+            const isHidden = input.type === 'password';
+            input.type = isHidden ? 'text' : 'password';
+            icon.classList.toggle('bi-eye', !isHidden);
+            icon.classList.toggle('bi-eye-slash', isHidden);
+        });
+    </script>
 </body>
 </html>
