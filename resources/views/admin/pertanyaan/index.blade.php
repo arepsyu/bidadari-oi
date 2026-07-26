@@ -3,13 +3,20 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-    <form method="GET" class="d-flex gap-2">
+    <form method="GET" class="d-flex gap-2 flex-wrap">
+        <input type="text" name="search" value="{{ $search ?? '' }}" class="form-control form-control-sm" placeholder="Cari teks pertanyaan / indikator..." style="min-width: 260px;">
         <select name="klaster_id" class="form-select form-select-sm" onchange="this.form.submit()">
             <option value="">-- Semua Klaster --</option>
             @foreach($klasters as $k)
                 <option value="{{ $k->id }}" {{ (string) $klasterId === (string) $k->id ? 'selected' : '' }}>{{ $k->nama }}</option>
             @endforeach
         </select>
+        <button type="submit" class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-search"></i> Cari
+        </button>
+        @if(($search ?? '') !== '' || $klasterId)
+            <a href="{{ route('admin.pertanyaan.index') }}" class="btn btn-sm btn-outline-secondary">Reset</a>
+        @endif
     </form>
     <a href="{{ route('admin.pertanyaan.create') }}" class="btn btn-primary">
         <i class="bi bi-plus-lg me-1"></i> Tambah Pertanyaan

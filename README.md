@@ -1,66 +1,111 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# BIDADARI OI - Bank Informasi Data Kabupaten Layak Anak Terintegrasi Ogan Ilir
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi berbasis **Laravel 10** untuk mengelola pengumpulan data dari OPD/organisasi
+(user) yang dipantau oleh 1 akun Admin.
 
-## About Laravel
+## Fitur
+- Login (admin & user), tanpa registrasi mandiri
+- Admin: CRUD akun user (tambah/edit/hapus/nonaktifkan)
+- Admin: kelola "Jenis Data" secara dinamis (bisa tambah/edit/hapus kapan saja) -
+  tiap jenis data punya tipe: Teks, Teks Panjang, Angka, Tanggal, atau Upload File
+- Admin: Dashboard monitoring - progres kelengkapan data tiap user + detail per user
+- User: hanya bisa mengisi/upload data sesuai jenis data yang dibuat admin
+- Tema warna disesuaikan dengan logo BIDADARI OI (biru & hijau)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Cara Install di Laragon
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### 1. Buat project Laravel baru
+Buka terminal (Laragon > Terminal atau cmder), arahkan ke folder `laragon/www`, lalu jalankan:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+```
+composer create-project laravel/laravel bidadari-oi "^10.0"
+```
 
-## Learning Laravel
+> PENTING: pakai versi Laravel 10 (`^10.0`) supaya struktur file cocok dengan yang di paket ini
+> (Laravel 11/12 punya struktur folder yang berbeda).
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 2. Copy file dari paket ini
+Salin **semua isi folder paket ini** (bidadari-oi-app) ke dalam folder project
+`laragon/www/bidadari-oi` yang baru dibuat, **timpa/replace** file yang sudah ada
+(composer.json JANGAN ditimpa, biarkan yang asli dari create-project).
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+File/folder yang perlu disalin & menimpa punya Laravel:
+- `app/Http/Kernel.php`
+- `app/Http/Middleware/EnsureUserIsAdmin.php` (baru)
+- `app/Http/Controllers/**` (baru)
+- `app/Models/**`
+- `app/Providers/AppServiceProvider.php`
+- `database/migrations/**` (tambahan, jangan hapus migration bawaan Laravel)
+- `database/seeders/DatabaseSeeder.php`
+- `routes/web.php`
+- `resources/views/**`
+- `public/images/logo.png`
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 3. Buat database
+Buka HeidiSQL / phpMyAdmin dari Laragon, buat database baru misalnya `bidadari_oi`.
 
-## Laravel Sponsors
+### 4. Konfigurasi .env
+Copy `.env.example` menjadi `.env` (jika belum ada), lalu sesuaikan:
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```
+APP_NAME="BIDADARI OI"
+APP_URL=http://bidadari-oi.test
 
-### Premium Partners
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=bidadari_oi
+DB_USERNAME=root
+DB_PASSWORD=
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+FILESYSTEM_DISK=public
+```
 
-## Contributing
+### 5. Install dependency & generate key
+Jalankan di terminal dalam folder project:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```
+composer install
+php artisan key:generate
+```
 
-## Code of Conduct
+### 6. Migrasi database + seed data awal
+```
+php artisan migrate --seed
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Perintah ini otomatis membuat:
+- Akun **Admin**: `admin@bidadarioi.test` / password: `password123`
+- Akun contoh **User**: `user@bidadarioi.test` / password: `password123`
+- 3 contoh Jenis Data (Nama Organisasi, Upload SK Organisasi, Upload Data Pendukung)
 
-## Security Vulnerabilities
+> Segera ganti password admin setelah login pertama kali lewat menu Kelola Akun User.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 7. Buat symbolic link storage (WAJIB, untuk file upload)
+```
+php artisan storage:link
+```
 
-## License
+### 8. Jalankan aplikasi
+Cara termudah lewat Laragon: klik kanan folder project di Laragon > Auto Create Virtual Hosts,
+lalu akses `http://bidadari-oi.test` di browser.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Atau jalankan manual:
+```
+php artisan serve
+```
+lalu buka `http://127.0.0.1:8000`
+
+## Struktur Data
+- **users**: name, email, password, role (admin/user), organisasi, is_active
+- **data_requirements**: judul, deskripsi, tipe (text/textarea/number/date/file), wajib, urutan
+- **submissions**: user_id, data_requirement_id, value, file_path, file_original_name
+
+## Alur Penggunaan
+1. Admin login, buka **Kelola Jenis Data** untuk menambahkan daftar data yang wajib
+   diisi seluruh user (misal: Nama Organisasi, Upload SK, dst).
+2. Admin buka **Kelola Akun User** untuk membuat akun tiap OPD/organisasi.
+3. User login, otomatis diarahkan ke halaman **Data Saya**, mengisi/upload data
+   sesuai daftar yang dibuat admin.
+4. Admin memantau progres semua user lewat **Dashboard Monitoring**, bisa klik
+   "Lihat" untuk detail data per user (termasuk download file yang diupload).

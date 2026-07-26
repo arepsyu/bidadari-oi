@@ -48,7 +48,7 @@
                     <tr>
                         <td>{{ $p->indikator->nama }}: {{ $p->teks }}</td>
                         <td>
-                            @if($sub)<span class="badge-ok">Sudah Diisi</span>@else<span class="badge-no">Belum Diisi</span>@endif
+                            @if($sub)<span class="badge-ok">{{ $sub->statusLabel() }}</span>@else<span class="badge-no">Belum Diisi</span>@endif
                         </td>
                         <td>
                             @if($sub){{ $p->tipe === 'file' ? $sub->file_original_name : $sub->value }}@else - @endif

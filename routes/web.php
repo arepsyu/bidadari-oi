@@ -4,10 +4,22 @@ use App\Http\Controllers\Admin\MonitoringController;
 use App\Http\Controllers\Admin\OpdController;
 use App\Http\Controllers\Admin\PertanyaanController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\VerificationController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DeployController;
 use App\Http\Controllers\User\SubmissionController;
 use Illuminate\Support\Facades\Route;
+
+// ==================================================================================
+// ROUTE SEMENTARA BUAT DEPLOY DI HOSTING TANPA SSH (misal InfinityFree).
+// WAJIB DIHAPUS setelah deploy berhasil! Lihat README-INFINITYFREE.md
+// ==================================================================================
+Route::get('/deploy/migrate', [DeployController::class, 'migrate']);
+Route::get('/deploy/seed', [DeployController::class, 'seed']);
+Route::get('/deploy/fresh', [DeployController::class, 'fresh']);
+Route::get('/deploy/clear-cache', [DeployController::class, 'clearCache']);
+Route::get('/deploy/storage-link', [DeployController::class, 'storageLink']);
 
 Route::get('/', function () {
     return auth()->check() ? redirect()->route('dashboard') : redirect()->route('login');
@@ -40,6 +52,9 @@ Route::middleware('auth')->group(function () {
 
         Route::resource('users', UserController::class)->except(['show']);
         Route::resource('pertanyaan', PertanyaanController::class)->except(['show']);
+
+        Route::post('/submissions/{submission}/verify', [VerificationController::class, 'verify'])->name('submissions.verify');
+        Route::get('/submissions/{submission}/history', [VerificationController::class, 'history'])->name('submissions.history');
 
         Route::get('/opd', [OpdController::class, 'index'])->name('opd.index');
         Route::post('/opd', [OpdController::class, 'store'])->name('opd.store');

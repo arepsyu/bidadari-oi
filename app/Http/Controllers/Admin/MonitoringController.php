@@ -20,10 +20,14 @@ class MonitoringController extends Controller
         $totalUsers = User::where('role', 'user')->count();
         $totalPertanyaan = Pertanyaan::count();
         $totalSubmissions = Submission::count();
+        $menungguVerifikasi = Submission::where('status', 'menunggu')->count();
 
         $users = User::where('role', 'user')
             ->with('opd')
             ->withCount('submissions')
+            ->withCount(['submissions as menunggu_count' => function ($q) {
+                $q->where('status', 'menunggu');
+            }])
             ->orderBy('name')
             ->get()
             ->map(function ($user) {
@@ -58,7 +62,8 @@ class MonitoringController extends Controller
             'users',
             'belumLengkap',
             'sudahLengkap',
-            'perKategori'
+            'perKategori',
+            'menungguVerifikasi'
         ));
     }
 
@@ -82,6 +87,9 @@ class MonitoringController extends Controller
     {
         $users = User::where('role', 'user')
             ->withCount('submissions')
+            ->withCount(['submissions as menunggu_count' => function ($q) {
+                $q->where('status', 'menunggu');
+            }])
             ->orderBy('name')
             ->get()
             ->map(function ($user) {

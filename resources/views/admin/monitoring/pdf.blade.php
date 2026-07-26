@@ -34,6 +34,7 @@
                 <th class="text-center">Data Terisi</th>
                 <th class="text-center">Total Relevan</th>
                 <th class="text-center">Persentase</th>
+                <th class="text-center">Menunggu Verifikasi</th>
             </tr>
         </thead>
         <tbody>
@@ -47,9 +48,10 @@
                 <td class="text-center">{{ $user->submissions_count }}</td>
                 <td class="text-center">{{ $user->relevan_count }}</td>
                 <td class="text-center">{{ $user->progress }}%</td>
+                <td class="text-center">{{ $user->menunggu_count }}</td>
             </tr>
             @empty
-            <tr><td colspan="8" class="text-center">Belum ada data user.</td></tr>
+            <tr><td colspan="9" class="text-center">Belum ada data user.</td></tr>
             @endforelse
         </tbody>
     </table>

@@ -16,6 +16,7 @@ class PertanyaanController extends Controller
     public function index(Request $request): View
     {
         $klasterId = $request->get('klaster_id');
+        $search = trim((string) $request->get('search'));
 
         $query = Pertanyaan::with('indikator.klaster', 'opds')->withCount('submissions');
 
@@ -23,10 +24,18 @@ class PertanyaanController extends Controller
             $query->whereHas('indikator', fn ($q) => $q->where('klaster_id', $klasterId));
         }
 
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('teks', 'like', "%{$search}%")
+                    ->orWhere('kode', 'like', "%{$search}%")
+                    ->orWhereHas('indikator', fn ($iq) => $iq->where('nama', 'like', "%{$search}%"));
+            });
+        }
+
         $pertanyaans = $query->orderBy('indikator_id')->orderBy('urutan')->paginate(25)->withQueryString();
         $klasters = Klaster::orderBy('urutan')->get();
 
-        return view('admin.pertanyaan.index', compact('pertanyaans', 'klasters', 'klasterId'));
+        return view('admin.pertanyaan.index', compact('pertanyaans', 'klasters', 'klasterId', 'search'));
     }
 
     public function create(): View

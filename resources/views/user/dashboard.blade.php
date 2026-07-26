@@ -31,12 +31,19 @@
                                 <div class="small">{{ $p->teks }}</div>
                                 <div class="ms-2">
                                     @if($sub)
-                                        <span class="badge bg-success"><i class="bi bi-check-circle"></i> Terisi</span>
+                                        <span class="badge {{ $sub->statusBadgeClass() }}">{{ $sub->statusLabel() }}</span>
                                     @else
                                         <span class="badge bg-danger">Belum</span>
                                     @endif
                                 </div>
                             </div>
+
+                            @if($sub && $sub->isDitolak() && $sub->catatan_admin)
+                                <div class="alert alert-danger py-2 px-3 small mb-2">
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                    <strong>Perlu revisi:</strong> {{ $sub->catatan_admin }}
+                                </div>
+                            @endif
 
                             <form method="POST" action="{{ route('user.submissions.store', $p) }}" enctype="multipart/form-data" class="row g-2 align-items-end">
                                 @csrf
@@ -46,7 +53,7 @@
                                         @if($sub && $sub->file_path)
                                             <div class="small mt-1">
                                                 File saat ini:
-                                                <a href="{{ asset('storage/' . $sub->file_path) }}" target="_blank">{{ $sub->file_original_name }}</a>
+                                                <a href="{{ asset($sub->file_path) }}" target="_blank">{{ $sub->file_original_name }}</a>
                                             </div>
                                         @endif
                                     @elseif($p->tipe === 'textarea')

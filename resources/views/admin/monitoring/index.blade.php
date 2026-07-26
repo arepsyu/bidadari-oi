@@ -28,9 +28,9 @@
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card stat-card blue p-3">
-            <div class="small opacity-75">Total Data Terupload</div>
-            <div class="fs-3 fw-bold">{{ $totalSubmissions }}</div>
+        <div class="card p-3" style="border-radius:14px; color:#fff; background: linear-gradient(135deg, #b9770e, #f0a500);">
+            <div class="small opacity-75">Menunggu Verifikasi</div>
+            <div class="fs-3 fw-bold">{{ $menungguVerifikasi }}</div>
         </div>
     </div>
     <div class="col-md-3">
@@ -69,7 +69,8 @@
                     <th class="ps-3">Organisasi / Akun</th>
                     <th>Kategori</th>
                     <th>Data Terisi</th>
-                    <th style="width: 220px;">Progres</th>
+                    <th>Menunggu Verifikasi</th>
+                    <th style="width: 200px;">Progres</th>
                     <th class="text-end pe-3">Aksi</th>
                 </tr>
             </thead>
@@ -84,6 +85,13 @@
                         <span class="badge bg-light text-dark border">{{ $user->kategoriLabel() }}</span>
                     </td>
                     <td>{{ $user->submissions_count }} / {{ $user->relevan_count }}</td>
+                    <td>
+                        @if($user->menunggu_count > 0)
+                            <span class="badge bg-warning text-dark">{{ $user->menunggu_count }} pending</span>
+                        @else
+                            <span class="text-muted small">-</span>
+                        @endif
+                    </td>
                     <td>
                         <div class="progress">
                             <div class="progress-bar" style="width: {{ $user->progress }}%"></div>
@@ -103,7 +111,7 @@
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="5" class="text-center py-4 text-muted">Belum ada akun user.</td></tr>
+                <tr><td colspan="6" class="text-center py-4 text-muted">Belum ada akun user.</td></tr>
                 @endforelse
             </tbody>
         </table>

@@ -18,13 +18,16 @@ class MonitoringExport implements FromCollection, WithHeadings, WithMapping, Sho
     {
         return User::where('role', 'user')
             ->withCount('submissions')
+            ->withCount(['submissions as menunggu_count' => function ($q) {
+                $q->where('status', 'menunggu');
+            }])
             ->orderBy('name')
             ->get();
     }
 
     public function headings(): array
     {
-        return ['No', 'Kategori', 'Organisasi', 'Nama User', 'Email', 'Data Terisi', 'Total Data Relevan', 'Persentase (%)'];
+        return ['No', 'Kategori', 'Organisasi', 'Nama User', 'Email', 'Data Terisi', 'Total Data Relevan', 'Persentase (%)', 'Menunggu Verifikasi'];
     }
 
     public function map($user): array
@@ -45,6 +48,7 @@ class MonitoringExport implements FromCollection, WithHeadings, WithMapping, Sho
             $user->submissions_count,
             $totalRelevan,
             $percentage,
+            $user->menunggu_count,
         ];
     }
 

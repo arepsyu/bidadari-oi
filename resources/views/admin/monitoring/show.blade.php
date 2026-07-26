@@ -34,36 +34,74 @@
                         <th class="ps-3">Indikator / Pertanyaan</th>
                         <th>Status</th>
                         <th>Isi / File</th>
-                        <th class="pe-3">Update</th>
+                        <th>Update</th>
+                        <th class="text-end pe-3">Verifikasi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($groupByKlaster as $p)
                         @php $sub = $submissions->get($p->id); @endphp
                         <tr>
-                            <td class="ps-3">
+                            <td class="ps-3" style="max-width: 260px;">
                                 <div class="small text-muted">{{ $p->indikator->nama }}</div>
                                 <div class="small">{{ $p->teks }}</div>
                             </td>
                             <td>
                                 @if($sub)
-                                    <span class="badge bg-success">Sudah Diisi</span>
+                                    <span class="badge {{ $sub->statusBadgeClass() }}">{{ $sub->statusLabel() }}</span>
+                                    @if($sub->isDitolak() && $sub->catatan_admin)
+                                        <div class="small text-danger mt-1">"{{ $sub->catatan_admin }}"</div>
+                                    @endif
                                 @else
-                                    <span class="badge bg-danger">Belum Diisi</span>
+                                    <span class="badge bg-secondary">Belum Diisi</span>
                                 @endif
                             </td>
                             <td>
                                 @if($sub && $p->tipe === 'file' && $sub->file_path)
-                                    <a href="{{ \Illuminate\Support\Facades\Storage::url($sub->file_path) }}" target="_blank">
-                                        <i class="bi bi-file-earmark-arrow-down"></i> {{ $sub->file_original_name }}
+                                    <a href="{{ asset($sub->file_path) }}" target="_blank">
+                                        <i class="bi bi-file-earmark-arrow-down"></i> {{ \Illuminate\Support\Str::limit($sub->file_original_name, 25) }}
                                     </a>
                                 @elseif($sub)
-                                    {{ $sub->value }}
+                                    {{ \Illuminate\Support\Str::limit($sub->value, 40) }}
                                 @else
                                     <span class="text-muted">-</span>
                                 @endif
+                                @if($sub && $sub->histories->count() > 0)
+                                    <br>
+                                    <a href="{{ route('admin.submissions.history', $sub) }}" class="small">
+                                        <i class="bi bi-clock-history"></i> Riwayat ({{ $sub->histories->count() }})
+                                    </a>
+                                @endif
                             </td>
-                            <td class="pe-3">{{ $sub?->updated_at?->format('d M Y H:i') ?? '-' }}</td>
+                            <td>
+                                <span class="small">{{ $sub?->updated_at?->format('d M Y H:i') ?? '-' }}</span>
+                            </td>
+                            <td class="text-end pe-3">
+                                @if($sub)
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                            Aksi
+                                        </button>
+                                        <div class="dropdown-menu dropdown-menu-end p-3" style="min-width: 280px;">
+                                            <form method="POST" action="{{ route('admin.submissions.verify', $sub) }}" class="mb-2">
+                                                @csrf
+                                                <input type="hidden" name="status" value="disetujui">
+                                                <button type="submit" class="btn btn-sm btn-success w-100">
+                                                    <i class="bi bi-check-circle"></i> Setujui
+                                                </button>
+                                            </form>
+                                            <form method="POST" action="{{ route('admin.submissions.verify', $sub) }}">
+                                                @csrf
+                                                <input type="hidden" name="status" value="ditolak">
+                                                <textarea name="catatan_admin" class="form-control form-control-sm mb-2" rows="2" placeholder="Alasan penolakan / revisi yang diminta..." required></textarea>
+                                                <button type="submit" class="btn btn-sm btn-danger w-100">
+                                                    <i class="bi bi-x-circle"></i> Tolak & Minta Revisi
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                @endif
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>

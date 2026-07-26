@@ -31,6 +31,7 @@ class UserDetailExport implements FromCollection, WithHeadings, ShouldAutoSize, 
                 'indikator' => $p->indikator->nama,
                 'pertanyaan' => $p->teks,
                 'status' => $sub ? 'Sudah Diisi' : 'Belum Diisi',
+                'status_verifikasi' => $sub ? $sub->statusLabel() : '-',
                 'isi' => $sub ? ($p->tipe === 'file' ? $sub->file_original_name : $sub->value) : '-',
                 'terakhir_update' => $sub?->updated_at?->format('d-m-Y H:i') ?? '-',
             ];
@@ -39,7 +40,7 @@ class UserDetailExport implements FromCollection, WithHeadings, ShouldAutoSize, 
 
     public function headings(): array
     {
-        return ['Klaster', 'Indikator', 'Pertanyaan', 'Status', 'Isi / Nama File', 'Terakhir Update'];
+        return ['Klaster', 'Indikator', 'Pertanyaan', 'Status', 'Status Verifikasi', 'Isi / Nama File', 'Terakhir Update'];
     }
 
     public function styles(Worksheet $sheet)
