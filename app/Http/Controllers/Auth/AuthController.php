@@ -18,20 +18,20 @@ class AuthController extends Controller
     public function login(Request $request): RedirectResponse
     {
         $credentials = $request->validate([
-            'email' => ['required', 'email'],
+            'username' => ['required', 'string'],
             'password' => ['required'],
         ]);
 
         if (! Auth::attempt($credentials, $request->boolean('remember'))) {
             return back()->withErrors([
-                'email' => 'Email atau password yang Anda masukkan salah.',
-            ])->onlyInput('email');
+                'username' => 'Username atau password yang Anda masukkan salah.',
+            ])->onlyInput('username');
         }
 
         if (! Auth::user()->is_active) {
             Auth::logout();
             return back()->withErrors([
-                'email' => 'Akun Anda sedang dinonaktifkan. Hubungi admin.',
+                'username' => 'Akun Anda sedang dinonaktifkan. Hubungi admin.',
             ]);
         }
 

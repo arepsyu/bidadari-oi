@@ -79,7 +79,7 @@
                 <tr>
                     <td class="ps-3">
                         <div class="fw-semibold">{{ $user->organisasi ?? $user->name }}</div>
-                        <div class="small text-muted">{{ $user->email }}</div>
+                        <div class="small text-muted">{{ $user->username }}</div>
                     </td>
                     <td>
                         <span class="badge bg-light text-dark border">{{ $user->kategoriLabel() }}</span>

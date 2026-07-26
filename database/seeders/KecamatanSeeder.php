@@ -32,11 +32,13 @@ class KecamatanSeeder extends Seeder
 
         foreach ($kecamatanList as $nama) {
             $slug = Str::slug($nama);
+            $username = "kecamatan.{$slug}";
 
             User::firstOrCreate(
-                ['email' => "kecamatan.{$slug}@bidadarioi.test"],
+                ['username' => $username],
                 [
                     'name' => 'Kecamatan ' . $nama,
+                    'email' => "{$username}@bidadarioi.local",
                     'password' => Hash::make('kecamatan123'),
                     'role' => 'user',
                     'kategori' => 'kecamatan',

@@ -13,9 +13,10 @@ class DatabaseSeeder extends Seeder
     {
         // 1. Akun Admin
         User::firstOrCreate(
-            ['email' => 'admin@bidadarioi.test'],
+            ['username' => 'admin'],
             [
                 'name' => 'Administrator BIDADARI OI',
+                'email' => 'admin@bidadarioi.local',
                 'password' => Hash::make('password123'),
                 'role' => 'admin',
                 'is_active' => true,
@@ -32,9 +33,10 @@ class DatabaseSeeder extends Seeder
         $contohOpd = Opd::first();
         if ($contohOpd) {
             User::firstOrCreate(
-                ['email' => 'opd.contoh@bidadarioi.test'],
+                ['username' => 'opd.contoh'],
                 [
                     'name' => 'User ' . $contohOpd->nama,
+                    'email' => 'opd.contoh@bidadarioi.local',
                     'password' => Hash::make('password123'),
                     'role' => 'user',
                     'kategori' => 'opd',
@@ -46,9 +48,10 @@ class DatabaseSeeder extends Seeder
         }
 
         User::firstOrCreate(
-            ['email' => 'desa.contoh@bidadarioi.test'],
+            ['username' => 'desa.contoh'],
             [
                 'name' => 'Desa Contoh',
+                'email' => 'desa.contoh@bidadarioi.local',
                 'password' => Hash::make('password123'),
                 'role' => 'user',
                 'kategori' => 'desa',

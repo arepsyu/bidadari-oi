@@ -78,7 +78,7 @@ class UserController extends Controller
     {
         $rules = [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'unique:users,email' . ($user ? ',' . $user->id : '')],
+            'username' => ['required', 'string', 'max:255', 'alpha_dash', 'unique:users,username' . ($user ? ',' . $user->id : '')],
             'password' => [$user ? 'nullable' : 'required', 'string', 'min:6'],
             'role' => ['required', 'in:admin,user'],
             'kategori' => ['nullable', 'required_if:role,user', 'in:opd,kecamatan,desa'],
@@ -100,6 +100,10 @@ class UserController extends Controller
         } else {
             $data['opd_id'] = null;
         }
+
+        // Kolom email masih ada di database (bawaan Laravel), tapi gak dipakai buat login lagi.
+        // Diisi otomatis dari username biar gak perlu ditanyain ke admin.
+        $data['email'] = $data['username'] . '@bidadarioi.local';
 
         return $data;
     }

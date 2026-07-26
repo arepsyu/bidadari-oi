@@ -19,7 +19,7 @@
 <div class="card mb-3">
     <div class="card-body">
         <h6 class="fw-bold mb-1">{{ $user->organisasi ?? '-' }}</h6>
-        <div class="text-muted small">{{ $user->name }} &middot; {{ $user->email }} &middot; {{ $user->kategoriLabel() }}</div>
+        <div class="text-muted small">{{ $user->name }} &middot; {{ $user->username }} &middot; {{ $user->kategoriLabel() }}</div>
     </div>
 </div>
 

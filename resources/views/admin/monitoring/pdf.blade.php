@@ -30,7 +30,7 @@
                 <th>Kategori</th>
                 <th>Organisasi</th>
                 <th>Nama User</th>
-                <th>Email</th>
+                <th>Username</th>
                 <th class="text-center">Data Terisi</th>
                 <th class="text-center">Total Relevan</th>
                 <th class="text-center">Persentase</th>
@@ -44,7 +44,7 @@
                 <td>{{ $user->kategoriLabel() }}</td>
                 <td>{{ $user->organisasi ?? '-' }}</td>
                 <td>{{ $user->name }}</td>
-                <td>{{ $user->email }}</td>
+                <td>{{ $user->username }}</td>
                 <td class="text-center">{{ $user->submissions_count }}</td>
                 <td class="text-center">{{ $user->relevan_count }}</td>
                 <td class="text-center">{{ $user->progress }}%</td>

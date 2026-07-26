@@ -15,7 +15,7 @@
             <thead class="table-light">
                 <tr>
                     <th class="ps-3">Nama</th>
-                    <th>Email</th>
+                    <th>Username</th>
                     <th>Role</th>
                     <th>Kategori</th>
                     <th>Organisasi</th>
@@ -27,7 +27,7 @@
                 @forelse($users as $user)
                 <tr>
                     <td class="ps-3">{{ $user->name }}</td>
-                    <td>{{ $user->email }}</td>
+                    <td>{{ $user->username }}</td>
                     <td>
                         <span class="badge {{ $user->role === 'admin' ? 'bg-primary' : 'bg-secondary' }}">
                             {{ ucfirst($user->role) }}

@@ -4,9 +4,10 @@
     @error('name') <div class="text-danger small">{{ $message }}</div> @enderror
 </div>
 <div class="mb-3">
-    <label class="form-label">Email</label>
-    <input type="email" name="email" class="form-control" value="{{ old('email', $user->email ?? '') }}" required>
-    @error('email') <div class="text-danger small">{{ $message }}</div> @enderror
+    <label class="form-label">Username</label>
+    <input type="text" name="username" class="form-control" value="{{ old('username', $user->username ?? '') }}" placeholder="Contoh: kecamatan.indralaya" required>
+    <div class="form-text">Cukup pakai huruf, angka, titik, atau strip — gak perlu format email.</div>
+    @error('username') <div class="text-danger small">{{ $message }}</div> @enderror
 </div>
 <div class="mb-3">
     <label class="form-label">Password {{ isset($user) ? '(kosongkan jika tidak diubah)' : '' }}</label>

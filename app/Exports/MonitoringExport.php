@@ -27,7 +27,7 @@ class MonitoringExport implements FromCollection, WithHeadings, WithMapping, Sho
 
     public function headings(): array
     {
-        return ['No', 'Kategori', 'Organisasi', 'Nama User', 'Email', 'Data Terisi', 'Total Data Relevan', 'Persentase (%)', 'Menunggu Verifikasi'];
+        return ['No', 'Kategori', 'Organisasi', 'Nama User', 'Username', 'Data Terisi', 'Total Data Relevan', 'Persentase (%)', 'Menunggu Verifikasi'];
     }
 
     public function map($user): array
@@ -44,7 +44,7 @@ class MonitoringExport implements FromCollection, WithHeadings, WithMapping, Sho
             $user->kategoriLabel(),
             $user->organisasi ?? '-',
             $user->name,
-            $user->email,
+            $user->username,
             $user->submissions_count,
             $totalRelevan,
             $percentage,
