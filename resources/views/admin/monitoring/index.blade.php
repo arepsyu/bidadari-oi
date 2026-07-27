@@ -63,7 +63,8 @@
 <div class="card">
     <div class="card-header bg-white fw-semibold">Progres Kelengkapan Data per Akun</div>
     <div class="card-body p-0">
-        <table class="table align-middle mb-0">
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
             <thead class="table-light">
                 <tr>
                     <th class="ps-3">Organisasi / Akun</th>
@@ -115,6 +116,7 @@
                 @endforelse
             </tbody>
         </table>
+            </div>
     </div>
 </div>
 

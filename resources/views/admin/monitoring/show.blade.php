@@ -28,6 +28,7 @@
     <div class="card mb-3">
         <div class="card-header bg-white fw-bold text-bo-primary">{{ $klasterNama }}</div>
         <div class="card-body p-0">
+            <div class="table-responsive">
             <table class="table align-middle mb-0">
                 <thead class="table-light">
                     <tr>
@@ -108,6 +109,7 @@
                     @endforeach
                 </tbody>
             </table>
+            </div>
         </div>
     </div>
 @empty

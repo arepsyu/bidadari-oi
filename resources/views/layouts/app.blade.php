@@ -79,11 +79,49 @@
         .stat-card.green { background: linear-gradient(135deg, #2e8b5f, var(--bo-accent)); }
         .progress { height: 10px; border-radius: 6px; }
         .progress-bar { background-color: var(--bo-accent); }
+
+        /* ==== Mobile responsive sidebar ==== */
+        .bo-hamburger { display: none; }
+        .bo-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.4);
+            z-index: 1030;
+        }
+        @media (max-width: 991.98px) {
+            .bo-sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                z-index: 1040;
+                width: 260px;
+                max-width: 80vw;
+                transform: translateX(-100%);
+                transition: transform .25s ease-in-out;
+            }
+            .bo-sidebar.show {
+                transform: translateX(0);
+            }
+            .bo-hamburger {
+                display: inline-flex;
+            }
+            .bo-backdrop.show {
+                display: block;
+            }
+            .bo-topbar h5 {
+                font-size: 1rem;
+            }
+            .bo-topbar .text-end .small {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body>
+<div class="bo-backdrop" id="boBackdrop"></div>
 <div class="d-flex">
-    <nav class="bo-sidebar d-flex flex-column flex-shrink-0" style="width: 260px;">
+    <nav class="bo-sidebar d-flex flex-column flex-shrink-0" id="boSidebar" style="width: 260px;">
         <div class="brand d-flex align-items-center gap-2">
             <img src="{{ asset('images/logo.png') }}" alt="Logo">
             <div>
@@ -125,8 +163,13 @@
     </nav>
 
     <div class="flex-grow-1">
-        <div class="bo-topbar d-flex align-items-center justify-content-between px-4 py-3">
-            <h5 class="mb-0 text-bo-primary fw-bold">@yield('title', 'Dashboard')</h5>
+        <div class="bo-topbar d-flex align-items-center justify-content-between px-3 px-md-4 py-3">
+            <div class="d-flex align-items-center gap-2">
+                <button class="btn btn-outline-primary bo-hamburger" id="boHamburgerBtn" type="button">
+                    <i class="bi bi-list"></i>
+                </button>
+                <h5 class="mb-0 text-bo-primary fw-bold">@yield('title', 'Dashboard')</h5>
+            </div>
             <div class="text-end">
                 <div class="fw-semibold">{{ auth()->user()->name }}</div>
                 <div class="small text-muted">{{ auth()->user()->organisasi ?? ucfirst(auth()->user()->role) }}</div>
@@ -152,5 +195,33 @@
     </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const boSidebar = document.getElementById('boSidebar');
+    const boBackdrop = document.getElementById('boBackdrop');
+    const boHamburgerBtn = document.getElementById('boHamburgerBtn');
+
+    function boOpenSidebar() {
+        boSidebar.classList.add('show');
+        boBackdrop.classList.add('show');
+    }
+    function boCloseSidebar() {
+        boSidebar.classList.remove('show');
+        boBackdrop.classList.remove('show');
+    }
+
+    boHamburgerBtn?.addEventListener('click', function () {
+        boSidebar.classList.contains('show') ? boCloseSidebar() : boOpenSidebar();
+    });
+    boBackdrop?.addEventListener('click', boCloseSidebar);
+
+    // Tutup sidebar otomatis pas nav-link di-klik (biar gak nutupin halaman baru di HP)
+    boSidebar.querySelectorAll('a.nav-link').forEach(function (link) {
+        link.addEventListener('click', function () {
+            if (window.innerWidth <= 991.98) {
+                boCloseSidebar();
+            }
+        });
+    });
+</script>
 </body>
 </html>
