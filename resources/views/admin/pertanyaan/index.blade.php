@@ -18,7 +18,7 @@
             <a href="{{ route('admin.pertanyaan.index') }}" class="btn btn-sm btn-outline-secondary">Reset</a>
         @endif
     </form>
-    <a href="{{ route('admin.pertanyaan.create') }}" class="btn btn-primary">
+    <a href="{{ route('admin.pertanyaan.create') }}?redirect_query={{ urlencode(http_build_query(request()->query())) }}" class="btn btn-primary">
         <i class="bi bi-plus-lg me-1"></i> Tambah Pertanyaan
     </a>
 </div>
@@ -59,12 +59,13 @@
                     </td>
                     <td>{{ $p->submissions_count }}</td>
                     <td class="text-end pe-3">
-                        <a href="{{ route('admin.pertanyaan.edit', $p) }}" class="btn btn-sm btn-outline-primary">
+                        <a href="{{ route('admin.pertanyaan.edit', $p) }}?redirect_query={{ urlencode(http_build_query(request()->query())) }}" class="btn btn-sm btn-outline-primary">
                             <i class="bi bi-pencil"></i>
                         </a>
                         <form action="{{ route('admin.pertanyaan.destroy', $p) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin hapus pertanyaan ini?')">
                             @csrf
                             @method('DELETE')
+                            <input type="hidden" name="redirect_query" value="{{ http_build_query(request()->query()) }}">
                             <button type="submit" class="btn btn-sm btn-outline-danger">
                                 <i class="bi bi-trash"></i>
                             </button>

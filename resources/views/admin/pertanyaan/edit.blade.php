@@ -7,9 +7,10 @@
         <form method="POST" action="{{ route('admin.pertanyaan.update', $pertanyaan) }}">
             @csrf
             @method('PUT')
+            <input type="hidden" name="redirect_query" value="{{ request()->query('redirect_query') }}">
             @include('admin.pertanyaan._form', ['pertanyaan' => $pertanyaan])
             <button type="submit" class="btn btn-primary mt-2">Perbarui</button>
-            <a href="{{ route('admin.pertanyaan.index') }}" class="btn btn-light mt-2">Batal</a>
+            <a href="{{ route('admin.pertanyaan.index') }}?{{ request()->query('redirect_query') }}" class="btn btn-light mt-2">Batal</a>
         </form>
     </div>
 </div>

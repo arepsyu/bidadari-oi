@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Exports\MonitoringExport;
 use App\Exports\UserDetailExport;
 use App\Http\Controllers\Controller;
+use App\Models\Klaster;
 use App\Models\Pertanyaan;
 use App\Models\Submission;
 use App\Models\User;
@@ -54,6 +55,8 @@ class MonitoringController extends Controller
             ];
         });
 
+        [$klasterSkor, $totalEstimasi, $totalMaxSkor, $persenSkor] = $this->hitungEstimasiSkor();
+
         return view('admin.monitoring.index', compact(
             'totalUsers',
             'totalPertanyaan',
@@ -63,8 +66,55 @@ class MonitoringController extends Controller
             'belumLengkap',
             'sudahLengkap',
             'perKategori',
-            'menungguVerifikasi'
+            'menungguVerifikasi',
+            'klasterSkor',
+            'totalEstimasi',
+            'totalMaxSkor',
+            'persenSkor'
         ));
+    }
+
+    /**
+     * Hitung estimasi skor KLA: tiap pertanyaan yang punya minimal 1 data
+     * berstatus "disetujui" dianggap tercapai, nilai_max-nya masuk ke total.
+     * Dihitung per-pertanyaan (bukan per-submission) biar pertanyaan yang
+     * dijawab banyak akun sekaligus (kecamatan/desa) gak keitung dobel.
+     */
+    private function hitungEstimasiSkor(): array
+    {
+        $pertanyaanDisetujui = Submission::where('status', 'disetujui')
+            ->distinct()
+            ->pluck('pertanyaan_id');
+
+        $klasters = Klaster::with('indikators.pertanyaans')->orderBy('urutan')->get();
+
+        $klasterSkor = $klasters->map(function ($klaster) use ($pertanyaanDisetujui) {
+            $max = 0;
+            $estimasi = 0;
+
+            foreach ($klaster->indikators as $indikator) {
+                foreach ($indikator->pertanyaans as $p) {
+                    $nilaiMax = (float) ($p->nilai_max ?? 0);
+                    $max += $nilaiMax;
+                    if ($pertanyaanDisetujui->contains($p->id)) {
+                        $estimasi += $nilaiMax;
+                    }
+                }
+            }
+
+            return [
+                'nama' => $klaster->nama,
+                'estimasi' => $estimasi,
+                'max' => $max,
+                'persen' => $max > 0 ? round(($estimasi / $max) * 100) : 0,
+            ];
+        });
+
+        $totalEstimasi = round($klasterSkor->sum('estimasi'), 2);
+        $totalMaxSkor = round($klasterSkor->sum('max'), 2);
+        $persenSkor = $totalMaxSkor > 0 ? round(($totalEstimasi / $totalMaxSkor) * 100) : 0;
+
+        return [$klasterSkor, $totalEstimasi, $totalMaxSkor, $persenSkor];
     }
 
     public function show(User $user): View

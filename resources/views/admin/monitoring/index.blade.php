@@ -41,6 +41,53 @@
     </div>
 </div>
 
+<div class="card mb-4">
+    <div class="card-header bg-white fw-semibold d-flex align-items-center justify-content-between">
+        <span><i class="bi bi-award"></i> Estimasi Skor KLA</span>
+        <span class="small text-muted fw-normal">Dihitung dari data yang sudah "Disetujui" admin</span>
+    </div>
+    <div class="card-body">
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="p-3 rounded" style="background: var(--bo-light);">
+                    <div class="small text-muted">Estimasi Skor Saat Ini</div>
+                    <div class="fs-3 fw-bold text-bo-primary">{{ $totalEstimasi }} <span class="fs-6 text-muted fw-normal">/ {{ $totalMaxSkor }}</span></div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3 rounded" style="background: var(--bo-light);">
+                    <div class="small text-muted">Persentase Pencapaian</div>
+                    <div class="fs-3 fw-bold text-bo-primary">{{ $persenSkor }}%</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3 rounded" style="background: var(--bo-light);">
+                    <div class="small text-muted">Total Klaster Dinilai</div>
+                    <div class="fs-3 fw-bold text-bo-primary">{{ $klasterSkor->count() }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="small text-muted mb-2">Rincian per Klaster</div>
+        @foreach($klasterSkor as $ks)
+            <div class="mb-3">
+                <div class="d-flex justify-content-between small mb-1">
+                    <span>{{ $ks['nama'] }}</span>
+                    <span class="text-muted">{{ $ks['estimasi'] }} / {{ $ks['max'] }} ({{ $ks['persen'] }}%)</span>
+                </div>
+                <div class="progress">
+                    <div class="progress-bar {{ $ks['persen'] < 50 ? 'bg-warning' : '' }}" style="width: {{ $ks['persen'] }}%"></div>
+                </div>
+            </div>
+        @endforeach
+
+        <div class="small text-muted mt-2">
+            <i class="bi bi-info-circle"></i> Ini estimasi internal buat pemantauan, bukan skor resmi dari KemenPPPA.
+            Skor final tetap ditentukan lewat proses verifikasi lapangan oleh tim penilai KLA.
+        </div>
+    </div>
+</div>
+
 <div class="row g-3 mb-4">
     <div class="col-md-4">
         <div class="card h-100">

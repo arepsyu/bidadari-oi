@@ -73,7 +73,8 @@ class PertanyaanController extends Controller
             $pertanyaan->opds()->sync($data['opds']);
         }
 
-        return redirect()->route('admin.pertanyaan.index')->with('success', 'Pertanyaan berhasil ditambahkan.');
+        return redirect()->route('admin.pertanyaan.index', $this->redirectQueryParams($request))
+            ->with('success', 'Pertanyaan berhasil ditambahkan.');
     }
 
     public function edit(Pertanyaan $pertanyaan): View
@@ -109,12 +110,33 @@ class PertanyaanController extends Controller
         $pertanyaan->update($data);
         $pertanyaan->opds()->sync($data['opds'] ?? []);
 
-        return redirect()->route('admin.pertanyaan.index')->with('success', 'Pertanyaan berhasil diperbarui.');
+        return redirect()->route('admin.pertanyaan.index', $this->redirectQueryParams($request))
+            ->with('success', 'Pertanyaan berhasil diperbarui.');
     }
 
-    public function destroy(Pertanyaan $pertanyaan): RedirectResponse
+    public function destroy(Request $request, Pertanyaan $pertanyaan): RedirectResponse
     {
         $pertanyaan->delete();
-        return redirect()->route('admin.pertanyaan.index')->with('success', 'Pertanyaan berhasil dihapus.');
+
+        return redirect()->route('admin.pertanyaan.index', $this->redirectQueryParams($request))
+            ->with('success', 'Pertanyaan berhasil dihapus.');
+    }
+
+    /**
+     * Ambil kembali posisi halaman/filter/pencarian sebelumnya (dikirim lewat
+     * hidden input "redirect_query"), biar admin gak kelempar balik ke halaman 1
+     * tiap habis edit/hapus pertanyaan.
+     */
+    private function redirectQueryParams(Request $request): array
+    {
+        $raw = $request->input('redirect_query', '');
+
+        if (! $raw) {
+            return [];
+        }
+
+        parse_str($raw, $params);
+
+        return $params;
     }
 }
