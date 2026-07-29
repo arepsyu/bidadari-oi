@@ -147,6 +147,14 @@
                 <a href="{{ route('user.submissions.index') }}" class="nav-link {{ request()->routeIs('user.submissions.*') ? 'active' : '' }}">
                     <i class="bi bi-cloud-upload me-2"></i> Data Saya
                 </a>
+                @if(auth()->user()->isKecamatan())
+                    <a href="{{ route('user.desa.monitoring') }}" class="nav-link {{ request()->routeIs('user.desa.monitoring') ? 'active' : '' }}">
+                        <i class="bi bi-bar-chart-steps me-2"></i> Monitoring Desa
+                    </a>
+                    <a href="{{ route('user.desa.pilih') }}" class="nav-link {{ request()->routeIs('user.desa.pilih') || request()->routeIs('user.desa.show') ? 'active' : '' }}">
+                        <i class="bi bi-pencil-square me-2"></i> Input Data Desa
+                    </a>
+                @endif
             @endif
         </div>
         <div class="p-3 logout-area">

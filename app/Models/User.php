@@ -18,6 +18,7 @@ class User extends Authenticatable
         'role',
         'kategori',
         'opd_id',
+        'kecamatan_id',
         'organisasi',
         'is_active',
     ];
@@ -39,6 +40,11 @@ class User extends Authenticatable
     public function opd()
     {
         return $this->belongsTo(Opd::class);
+    }
+
+    public function kecamatan()
+    {
+        return $this->belongsTo(Kecamatan::class);
     }
 
     public function submissions()

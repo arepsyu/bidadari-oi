@@ -12,6 +12,7 @@ class Submission extends Model
     protected $fillable = [
         'user_id',
         'pertanyaan_id',
+        'desa_id',
         'value',
         'file_path',
         'file_original_name',
@@ -33,6 +34,11 @@ class Submission extends Model
     public function pertanyaan()
     {
         return $this->belongsTo(Pertanyaan::class);
+    }
+
+    public function desa()
+    {
+        return $this->belongsTo(Desa::class);
     }
 
     public function verifiedBy()

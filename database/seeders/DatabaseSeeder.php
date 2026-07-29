@@ -29,6 +29,10 @@ class DatabaseSeeder extends Seeder
         // 3. 16 akun Kecamatan se-Ogan Ilir
         $this->call(KecamatanSeeder::class);
 
+        // 3b. Master data 16 Kecamatan + 241 Desa/Kelurahan, sekaligus hubungkan
+        // tiap akun Kecamatan ke wilayahnya masing-masing
+        $this->call(KecamatanDesaSeeder::class);
+
         // 4. Contoh 1 akun OPD & 1 akun Desa buat demo
         $contohOpd = Opd::first();
         if ($contohOpd) {

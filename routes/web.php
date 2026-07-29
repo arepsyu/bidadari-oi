@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DeployController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\User\DesaController;
 use App\Http\Controllers\User\SubmissionController;
 use Illuminate\Support\Facades\Route;
 
@@ -44,6 +45,14 @@ Route::middleware('auth')->group(function () {
     Route::prefix('data-saya')->name('user.')->group(function () {
         Route::get('/', [SubmissionController::class, 'index'])->name('submissions.index');
         Route::post('/{pertanyaan}', [SubmissionController::class, 'store'])->name('submissions.store');
+    });
+
+    // Khusus akun Kecamatan: monitoring & input data per Desa di wilayahnya
+    Route::prefix('data-desa')->name('user.desa.')->group(function () {
+        Route::get('/monitoring', [DesaController::class, 'monitoring'])->name('monitoring');
+        Route::get('/input', [DesaController::class, 'pilihDesa'])->name('pilih');
+        Route::get('/input/{desa}', [DesaController::class, 'show'])->name('show');
+        Route::post('/input/{desa}/{pertanyaan}', [DesaController::class, 'store'])->name('store');
     });
 
     // Area Admin
