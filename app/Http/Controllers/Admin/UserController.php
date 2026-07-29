@@ -78,7 +78,13 @@ class UserController extends Controller
     {
         $rules = [
             'name' => ['required', 'string', 'max:255'],
-            'username' => ['required', 'string', 'max:255', 'alpha_dash', 'unique:users,username' . ($user ? ',' . $user->id : '')],
+            'username' => [
+                'required',
+                'string',
+                'max:255',
+                'regex:/^[a-zA-Z0-9_.-]+$/',
+                'unique:users,username' . ($user ? ',' . $user->id : ''),
+            ],
             'password' => [$user ? 'nullable' : 'required', 'string', 'min:6'],
             'role' => ['required', 'in:admin,user'],
             'kategori' => ['nullable', 'required_if:role,user', 'in:opd,kecamatan,desa'],
@@ -86,7 +92,20 @@ class UserController extends Controller
             'organisasi' => ['nullable', 'string', 'max:255'],
         ];
 
-        $data = $request->validate($rules);
+        $messages = [
+            'name.required' => 'Nama wajib diisi.',
+            'username.required' => 'Username wajib diisi.',
+            'username.regex' => 'Username cuma boleh diisi huruf, angka, titik (.), strip (-), atau underscore (_), tanpa spasi.',
+            'username.unique' => 'Username ini udah dipakai akun lain, coba pakai yang lain.',
+            'password.required' => 'Password wajib diisi.',
+            'password.min' => 'Password minimal 6 karakter.',
+            'role.required' => 'Role wajib dipilih.',
+            'kategori.required_if' => 'Kategori Akun wajib dipilih buat role User.',
+            'opd_id.required_if' => 'OPD/Dinas wajib dipilih buat kategori OPD.',
+            'opd_id.exists' => 'OPD/Dinas yang dipilih gak valid.',
+        ];
+
+        $data = $request->validate($rules, $messages);
 
         // Admin gak butuh kategori/opd
         if ($data['role'] === 'admin') {
