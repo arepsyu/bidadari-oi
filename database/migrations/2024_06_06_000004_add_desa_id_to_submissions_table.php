@@ -15,6 +15,16 @@ return new class extends Migration
             });
         }
 
+        // Pastiin ada index biasa khusus buat user_id dulu, SEBELUM unique index lama
+        // dihapus -- soalnya foreign key user_id butuh minimal 1 index yang nunjuk ke situ,
+        // dan index lama itu (user_id, pertanyaan_id) kebetulan jadi satu-satunya yang dipakai.
+        $idxUserId = DB::select("SHOW INDEX FROM submissions WHERE Key_name = 'submissions_user_id_index'");
+        if (empty($idxUserId)) {
+            Schema::table('submissions', function (Blueprint $table) {
+                $table->index('user_id', 'submissions_user_id_index');
+            });
+        }
+
         $indexLama = DB::select("SHOW INDEX FROM submissions WHERE Key_name = 'submissions_user_id_pertanyaan_id_unique'");
         if (! empty($indexLama)) {
             Schema::table('submissions', function (Blueprint $table) {
