@@ -9,8 +9,6 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Cuma tambah kolom desa_id kalau emang belum ada (jaga-jaga kalau migration
-        // ini sempat gagal di tengah jalan sebelumnya, biar aman dijalanin ulang).
         if (! Schema::hasColumn('submissions', 'desa_id')) {
             Schema::table('submissions', function (Blueprint $table) {
                 $table->foreignId('desa_id')->nullable()->after('pertanyaan_id')->constrained('desas')->cascadeOnDelete();
