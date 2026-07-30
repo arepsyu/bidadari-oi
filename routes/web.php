@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\DesaMonitoringController;
 use App\Http\Controllers\Admin\MonitoringController;
 use App\Http\Controllers\Admin\OpdController;
 use App\Http\Controllers\Admin\PertanyaanController;
@@ -63,6 +64,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/monitoring/{user}', [MonitoringController::class, 'show'])->name('monitoring.show');
         Route::get('/monitoring/{user}/export/excel', [MonitoringController::class, 'exportUserExcel'])->name('monitoring.export.user-excel');
         Route::get('/monitoring/{user}/export/pdf', [MonitoringController::class, 'exportUserPdf'])->name('monitoring.export.user-pdf');
+
+        Route::get('/monitoring-desa', [DesaMonitoringController::class, 'index'])->name('monitoring-desa.index');
+        Route::get('/monitoring-desa/{kecamatan}', [DesaMonitoringController::class, 'show'])->name('monitoring-desa.show');
 
         Route::resource('users', UserController::class)->except(['show']);
         Route::resource('pertanyaan', PertanyaanController::class)->except(['show']);

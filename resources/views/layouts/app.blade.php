@@ -134,6 +134,9 @@
                 <a href="{{ route('admin.monitoring.index') }}" class="nav-link {{ request()->routeIs('admin.monitoring.*') ? 'active' : '' }}">
                     <i class="bi bi-speedometer2 me-2"></i> Dashboard Monitoring
                 </a>
+                <a href="{{ route('admin.monitoring-desa.index') }}" class="nav-link {{ request()->routeIs('admin.monitoring-desa.*') ? 'active' : '' }}">
+                    <i class="bi bi-map me-2"></i> Monitoring Desa
+                </a>
                 <a href="{{ route('admin.users.index') }}" class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
                     <i class="bi bi-people me-2"></i> Kelola Akun
                 </a>
