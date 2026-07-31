@@ -212,7 +212,6 @@
 
     // ==== Fitur Reminder ====
     const reminderModalEl = document.getElementById('reminderModal');
-    const reminderModal = new bootstrap.Modal(reminderModalEl);
     const reminderText = document.getElementById('reminderText');
 
     function buatTeksReminder(organisasi, progress, terisi, relevan) {
@@ -230,7 +229,7 @@
                 btn.dataset.terisi,
                 btn.dataset.relevan
             );
-            reminderModal.show();
+            bootstrap.Modal.getOrCreateInstance(reminderModalEl).show();
         });
     });
 
