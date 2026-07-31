@@ -64,6 +64,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/monitoring/{user}', [MonitoringController::class, 'show'])->name('monitoring.show');
         Route::get('/monitoring/{user}/export/excel', [MonitoringController::class, 'exportUserExcel'])->name('monitoring.export.user-excel');
         Route::get('/monitoring/{user}/export/pdf', [MonitoringController::class, 'exportUserPdf'])->name('monitoring.export.user-pdf');
+        Route::get('/monitoring/{user}/download-zip', [MonitoringController::class, 'downloadZip'])->name('monitoring.download-zip');
 
         Route::get('/monitoring-desa', [DesaMonitoringController::class, 'index'])->name('monitoring-desa.index');
         Route::get('/monitoring-desa/{kecamatan}', [DesaMonitoringController::class, 'show'])->name('monitoring-desa.show');

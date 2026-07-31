@@ -13,6 +13,9 @@
         <a href="{{ route('admin.monitoring.export.user-pdf', $user) }}" class="btn btn-sm btn-primary">
             <i class="bi bi-file-earmark-pdf me-1"></i> Export PDF
         </a>
+        <a href="{{ route('admin.monitoring.download-zip', $user) }}" class="btn btn-sm btn-outline-dark">
+            <i class="bi bi-file-earmark-zip me-1"></i> Download Semua Dokumen (ZIP)
+        </a>
     </div>
 </div>
 

@@ -9,9 +9,12 @@ use App\Models\Pertanyaan;
 use App\Models\Submission;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
+use ZipArchive;
 
 class MonitoringController extends Controller
 {
@@ -124,5 +127,68 @@ class MonitoringController extends Controller
 
         $filename = 'data-' . str($user->organisasi ?? $user->name)->slug() . '.pdf';
         return $pdf->download($filename);
+    }
+
+    /**
+     * Download semua dokumen yang diupload 1 akun sekaligus, dikompres jadi ZIP.
+     * Kalau ada data per-desa (khusus akun Kecamatan), dikelompokin ke subfolder
+     * per desa biar gak campur aduk.
+     */
+    public function downloadZip(User $user): Response|RedirectResponse
+    {
+        $submissions = Submission::where('user_id', $user->id)
+            ->whereNotNull('file_path')
+            ->with(['pertanyaan', 'desa'])
+            ->orderBy('pertanyaan_id')
+            ->get();
+
+        if ($submissions->isEmpty()) {
+            return back()->with('error', 'Belum ada dokumen yang diupload akun ini.');
+        }
+
+        $zipFileName = 'dokumen-' . Str::slug($user->organisasi ?? $user->name) . '-' . now()->format('Ymd_His') . '.zip';
+        $zipDir = storage_path('app/temp-zip');
+
+        if (! is_dir($zipDir)) {
+            mkdir($zipDir, 0755, true);
+        }
+
+        $zipPath = $zipDir . '/' . $zipFileName;
+
+        $zip = new ZipArchive();
+        if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+            return back()->with('error', 'Gagal membuat file ZIP.');
+        }
+
+        $counter = 1;
+        foreach ($submissions as $sub) {
+            $fullPath = public_path($sub->file_path);
+
+            if (! file_exists($fullPath) || ! $sub->pertanyaan) {
+                continue;
+            }
+
+            $ext = pathinfo($sub->file_original_name ?? $sub->file_path, PATHINFO_EXTENSION) ?: 'dat';
+            $judul = Str::limit(Str::slug($sub->pertanyaan->teks, '-'), 60, '');
+            $namaFile = sprintf('%02d_%s.%s', $counter, $judul ?: 'dokumen', $ext);
+
+            if ($sub->desa_id && $sub->desa) {
+                $folder = 'Desa - ' . Str::slug($sub->desa->nama, '-');
+                $zip->addFile($fullPath, $folder . '/' . $namaFile);
+            } else {
+                $zip->addFile($fullPath, $namaFile);
+            }
+
+            $counter++;
+        }
+
+        $zip->close();
+
+        if ($counter === 1) {
+            @unlink($zipPath);
+            return back()->with('error', 'Gagal menemukan file dokumen di server (mungkin sudah terhapus).');
+        }
+
+        return response()->download($zipPath, $zipFileName)->deleteFileAfterSend(true);
     }
 }

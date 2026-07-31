@@ -109,6 +109,9 @@
                         <a href="{{ route('admin.monitoring.export.user-pdf', $user) }}" class="btn btn-sm btn-outline-danger">
                             <i class="bi bi-file-earmark-pdf"></i>
                         </a>
+                        <a href="{{ route('admin.monitoring.download-zip', $user) }}" class="btn btn-sm btn-outline-dark" title="Download semua dokumen (ZIP)">
+                            <i class="bi bi-file-earmark-zip"></i>
+                        </a>
                     </td>
                 </tr>
                 @empty
