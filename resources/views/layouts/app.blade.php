@@ -164,7 +164,7 @@
             <a href="{{ route('profile.password.edit') }}" class="btn btn-sm btn-outline-light w-100 mb-2">
                 <i class="bi bi-key"></i> Ganti Password
             </a>
-            <form action="{{ route('logout') }}" method="POST">
+            <form action="{{ route('logout') }}" method="POST" id="logoutForm">
                 @csrf
                 <button class="btn btn-sm btn-light w-100" type="submit">
                     <i class="bi bi-box-arrow-right me-1"></i> Keluar
@@ -205,6 +205,22 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="idleWarningModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center p-4">
+                <i class="bi bi-clock-history text-warning" style="font-size: 2.5rem;"></i>
+                <h6 class="fw-bold mt-3 mb-2">Sesi Anda akan berakhir</h6>
+                <p class="text-muted small mb-1">Anda gak aktif beberapa saat. Demi keamanan, sesi bakal otomatis logout dalam:</p>
+                <div class="fs-3 fw-bold text-bo-primary mb-3" id="idleCountdown">02:00</div>
+                <button type="button" class="btn btn-primary w-100" id="idleStayBtn">
+                    <i class="bi bi-check-circle"></i> Tetap Login
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     const boSidebar = document.getElementById('boSidebar');
@@ -233,6 +249,71 @@
             }
         });
     });
+
+    // ==== Auto-logout kalau idle (gak ada aktivitas) 45 menit ====
+    (function () {
+        const IDLE_LIMIT_MS = 45 * 60 * 1000; // 45 menit
+        const WARNING_BEFORE_MS = 2 * 60 * 1000; // munculin peringatan 2 menit sebelum abis
+
+        const idleModalEl = document.getElementById('idleWarningModal');
+        const idleModal = new bootstrap.Modal(idleModalEl);
+        const countdownEl = document.getElementById('idleCountdown');
+        const stayBtn = document.getElementById('idleStayBtn');
+
+        let idleTimer, warningTimer, countdownInterval;
+
+        function formatCountdown(ms) {
+            const totalSeconds = Math.max(0, Math.ceil(ms / 1000));
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            return String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+        }
+
+        function doAutoLogout() {
+            document.getElementById('logoutForm').submit();
+        }
+
+        function showWarning() {
+            let msLeft = WARNING_BEFORE_MS;
+            countdownEl.textContent = formatCountdown(msLeft);
+            idleModal.show();
+
+            countdownInterval = setInterval(function () {
+                msLeft -= 1000;
+                countdownEl.textContent = formatCountdown(msLeft);
+                if (msLeft <= 0) {
+                    clearInterval(countdownInterval);
+                }
+            }, 1000);
+        }
+
+        function resetIdleTimer() {
+            clearTimeout(idleTimer);
+            clearTimeout(warningTimer);
+            clearInterval(countdownInterval);
+
+            if (idleModalEl.classList.contains('show')) {
+                idleModal.hide();
+            }
+
+            warningTimer = setTimeout(showWarning, IDLE_LIMIT_MS - WARNING_BEFORE_MS);
+            idleTimer = setTimeout(doAutoLogout, IDLE_LIMIT_MS);
+        }
+
+        stayBtn.addEventListener('click', resetIdleTimer);
+
+        ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(function (evt) {
+            document.addEventListener(evt, function () {
+                // Jangan reset timer kalau modal peringatan lagi kebuka -- biar user
+                // sadar & sengaja klik "Tetap Login", bukan ke-reset gara-gara mouse kesenggol.
+                if (! idleModalEl.classList.contains('show')) {
+                    resetIdleTimer();
+                }
+            }, { passive: true });
+        });
+
+        resetIdleTimer();
+    })();
 </script>
 </body>
 </html>
