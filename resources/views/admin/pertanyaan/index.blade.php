@@ -62,7 +62,8 @@
                         <a href="{{ route('admin.pertanyaan.edit', $p) }}?redirect_query={{ urlencode(http_build_query(request()->query())) }}" class="btn btn-sm btn-outline-primary">
                             <i class="bi bi-pencil"></i>
                         </a>
-                        <form action="{{ route('admin.pertanyaan.destroy', $p) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin hapus pertanyaan ini?')">
+                        <form action="{{ route('admin.pertanyaan.destroy', $p) }}" method="POST" class="d-inline"
+                            onsubmit="return confirm('{{ $p->submissions_count > 0 ? '⚠️ PERINGATAN: Pertanyaan ini punya ' . $p->submissions_count . ' data yang udah diupload OPD/Kecamatan/Desa. Semua data itu bakal IKUT TERHAPUS PERMANEN kalau lanjut. Yakin mau hapus?' : 'Yakin hapus pertanyaan ini?' }}')">
                             @csrf
                             @method('DELETE')
                             <input type="hidden" name="redirect_query" value="{{ http_build_query(request()->query()) }}">

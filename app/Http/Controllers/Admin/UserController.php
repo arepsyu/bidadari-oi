@@ -13,10 +13,30 @@ use Illuminate\View\View;
 
 class UserController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $users = User::with('opd')->orderBy('role')->orderBy('name')->paginate(15);
-        return view('admin.users.index', compact('users'));
+        $search = trim((string) $request->get('search'));
+        $kategori = $request->get('kategori');
+
+        $query = User::with('opd')->withCount('submissions')->orderBy('role')->orderBy('name');
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('username', 'like', "%{$search}%")
+                    ->orWhere('organisasi', 'like', "%{$search}%");
+            });
+        }
+
+        if ($kategori === 'admin') {
+            $query->where('role', 'admin');
+        } elseif (in_array($kategori, ['opd', 'kecamatan', 'desa'])) {
+            $query->where('kategori', $kategori);
+        }
+
+        $users = $query->paginate(15)->withQueryString();
+
+        return view('admin.users.index', compact('users', 'search', 'kategori'));
     }
 
     public function create(): View

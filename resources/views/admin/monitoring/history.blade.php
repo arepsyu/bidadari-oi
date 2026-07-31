@@ -22,8 +22,8 @@
         <div class="d-flex justify-content-between align-items-center">
             <div>
                 @if($submission->pertanyaan->tipe === 'file' && $submission->file_path)
-                    <a href="{{ asset($submission->file_path) }}" target="_blank">
-                        <i class="bi bi-file-earmark-arrow-down"></i> {{ $submission->file_original_name }}
+                    <a href="javascript:void(0)" onclick="bidadariPreviewFile('{{ asset($submission->file_path) }}', '{{ addslashes($submission->file_original_name) }}')">
+                        <i class="bi bi-eye"></i> {{ $submission->file_original_name }}
                     </a>
                 @else
                     {{ $submission->value }}
@@ -43,8 +43,8 @@
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
                         @if($submission->pertanyaan->tipe === 'file' && $h->file_path)
-                            <a href="{{ asset($h->file_path) }}" target="_blank">
-                                <i class="bi bi-file-earmark-arrow-down"></i> {{ $h->file_original_name }}
+                            <a href="javascript:void(0)" onclick="bidadariPreviewFile('{{ asset($h->file_path) }}', '{{ addslashes($h->file_original_name) }}')">
+                                <i class="bi bi-eye"></i> {{ $h->file_original_name }}
                             </a>
                         @else
                             <span>{{ $h->value ?? '-' }}</span>

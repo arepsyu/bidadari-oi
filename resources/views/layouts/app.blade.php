@@ -205,6 +205,24 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="filePreviewModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title fw-bold text-truncate" id="filePreviewTitle">Preview Dokumen</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0" id="filePreviewBody" style="min-height: 400px; max-height: 75vh; overflow: auto;">
+            </div>
+            <div class="modal-footer">
+                <a href="#" id="filePreviewDownloadLink" target="_blank" class="btn btn-primary">
+                    <i class="bi bi-download"></i> Download File
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade" id="idleWarningModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -226,6 +244,34 @@
     const boSidebar = document.getElementById('boSidebar');
     const boBackdrop = document.getElementById('boBackdrop');
     const boHamburgerBtn = document.getElementById('boHamburgerBtn');
+
+    // ==== Preview dokumen (PDF/gambar) tanpa perlu download dulu ====
+    function bidadariPreviewFile(url, filename) {
+        const modalEl = document.getElementById('filePreviewModal');
+        const modal = new bootstrap.Modal(modalEl);
+        const body = document.getElementById('filePreviewBody');
+        const title = document.getElementById('filePreviewTitle');
+        const downloadLink = document.getElementById('filePreviewDownloadLink');
+
+        title.textContent = filename || 'Preview Dokumen';
+        downloadLink.href = url;
+
+        const ext = (filename || url).split('.').pop().toLowerCase();
+
+        if (ext === 'pdf') {
+            body.innerHTML = '<iframe src="' + url + '" style="width:100%; height:75vh; border:0;"></iframe>';
+        } else if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) {
+            body.innerHTML = '<div class="text-center p-3"><img src="' + url + '" style="max-width:100%; max-height:70vh;" alt="Preview"></div>';
+        } else {
+            body.innerHTML = '<div class="text-center p-5 text-muted">'
+                + '<i class="bi bi-file-earmark-x" style="font-size:2.5rem;"></i>'
+                + '<p class="mt-3 mb-0">Preview gak didukung buat tipe file ini (' + ext.toUpperCase() + ').</p>'
+                + '<p class="small">Klik "Download File" di bawah buat buka filenya.</p>'
+                + '</div>';
+        }
+
+        modal.show();
+    }
 
     function boOpenSidebar() {
         boSidebar.classList.add('show');

@@ -5,6 +5,9 @@
 <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
     <h6 class="text-muted mb-0">Ringkasan kelengkapan data seluruh OPD, Kecamatan & Desa</h6>
     <div>
+        <button type="button" class="btn btn-outline-warning" id="btnReminderMassal">
+            <i class="bi bi-megaphone me-1"></i> Reminder Massal
+        </button>
         <a href="{{ route('admin.monitoring.export.excel') }}" class="btn btn-accent">
             <i class="bi bi-file-earmark-excel me-1"></i> Export Excel
         </a>
@@ -112,6 +115,16 @@
                         <a href="{{ route('admin.monitoring.download-zip', $user) }}" class="btn btn-sm btn-outline-dark" title="Download semua dokumen (ZIP)">
                             <i class="bi bi-file-earmark-zip"></i>
                         </a>
+                        @if($user->progress < 100)
+                            <button type="button" class="btn btn-sm btn-outline-warning btn-reminder"
+                                data-organisasi="{{ $user->organisasi ?? $user->name }}"
+                                data-progress="{{ $user->progress }}"
+                                data-terisi="{{ $user->submissions_count }}"
+                                data-relevan="{{ $user->relevan_count }}"
+                                title="Kirim reminder">
+                                <i class="bi bi-megaphone"></i>
+                            </button>
+                        @endif
                     </td>
                 </tr>
                 @empty
@@ -120,6 +133,48 @@
             </tbody>
         </table>
             </div>
+    </div>
+</div>
+
+<!-- Modal Reminder per akun -->
+<div class="modal fade" id="reminderModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title fw-bold"><i class="bi bi-megaphone text-warning"></i> Teks Reminder</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <textarea class="form-control" id="reminderText" rows="7" readonly></textarea>
+                <div class="form-text">Copy teks ini, tinggal kirim manual lewat WhatsApp/email ke akun yang bersangkutan.</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="btnCopyReminder">
+                    <i class="bi bi-clipboard"></i> Salin Teks
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Reminder Massal -->
+<div class="modal fade" id="reminderMassalModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title fw-bold"><i class="bi bi-megaphone text-warning"></i> Reminder Massal (Akun Belum Lengkap)</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <textarea class="form-control" id="reminderMassalText" rows="14" readonly></textarea>
+                <div class="form-text">Daftar semua akun yang datanya belum 100%, diurutkan dari yang paling rendah.</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="btnCopyReminderMassal">
+                    <i class="bi bi-clipboard"></i> Salin Teks
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -153,6 +208,76 @@
             scales: { y: { beginAtZero: true, max: 100 } },
             plugins: { legend: { display: false } }
         }
+    });
+
+    // ==== Fitur Reminder ====
+    const reminderModalEl = document.getElementById('reminderModal');
+    const reminderModal = new bootstrap.Modal(reminderModalEl);
+    const reminderText = document.getElementById('reminderText');
+
+    function buatTeksReminder(organisasi, progress, terisi, relevan) {
+        return 'Halo ' + organisasi + ',\n\n'
+            + 'Ini reminder dari Admin BIDADARI OI. Kelengkapan pengisian data KLA untuk *' + organisasi + '* '
+            + 'saat ini baru mencapai *' + progress + '%* (' + terisi + ' dari ' + relevan + ' data).\n\n'
+            + 'Mohon segera dilengkapi ya, terima kasih 🙏';
+    }
+
+    document.querySelectorAll('.btn-reminder').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            reminderText.value = buatTeksReminder(
+                btn.dataset.organisasi,
+                btn.dataset.progress,
+                btn.dataset.terisi,
+                btn.dataset.relevan
+            );
+            reminderModal.show();
+        });
+    });
+
+    document.getElementById('btnCopyReminder').addEventListener('click', function () {
+        reminderText.select();
+        navigator.clipboard.writeText(reminderText.value);
+        this.innerHTML = '<i class="bi bi-check2"></i> Tersalin!';
+        setTimeout(() => this.innerHTML = '<i class="bi bi-clipboard"></i> Salin Teks', 2000);
+    });
+
+    // ==== Reminder Massal ====
+    const dataAkunBelumLengkap = [
+        @foreach($users->where('progress', '<', 100)->sortBy('progress') as $u)
+            {
+                organisasi: @json($u->organisasi ?? $u->name),
+                progress: {{ $u->progress }},
+                terisi: {{ $u->submissions_count }},
+                relevan: {{ $u->relevan_count }},
+            },
+        @endforeach
+    ];
+
+    document.getElementById('btnReminderMassal').addEventListener('click', function () {
+        const massalModal = new bootstrap.Modal(document.getElementById('reminderMassalModal'));
+        const massalText = document.getElementById('reminderMassalText');
+
+        if (dataAkunBelumLengkap.length === 0) {
+            massalText.value = 'Semua akun sudah 100% lengkap. Gak ada yang perlu diingetin. 🎉';
+        } else {
+            let teks = 'REMINDER KELENGKAPAN DATA KLA - ' + new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) + '\n\n';
+            teks += 'Berikut daftar organisasi yang datanya masih belum lengkap:\n\n';
+            dataAkunBelumLengkap.forEach(function (u, i) {
+                teks += (i + 1) + '. ' + u.organisasi + ' - ' + u.progress + '% (' + u.terisi + '/' + u.relevan + ')\n';
+            });
+            teks += '\nMohon segera dilengkapi datanya. Terima kasih 🙏';
+            massalText.value = teks;
+        }
+
+        massalModal.show();
+    });
+
+    document.getElementById('btnCopyReminderMassal').addEventListener('click', function () {
+        const massalText = document.getElementById('reminderMassalText');
+        massalText.select();
+        navigator.clipboard.writeText(massalText.value);
+        this.innerHTML = '<i class="bi bi-check2"></i> Tersalin!';
+        setTimeout(() => this.innerHTML = '<i class="bi bi-clipboard"></i> Salin Teks', 2000);
     });
 </script>
 @endsection

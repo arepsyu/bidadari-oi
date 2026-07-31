@@ -60,7 +60,7 @@
                                         @if($sub && $sub->file_path)
                                             <div class="small mt-1">
                                                 File saat ini:
-                                                <a href="{{ asset($sub->file_path) }}" target="_blank">{{ $sub->file_original_name }}</a>
+                                                <a href="javascript:void(0)" onclick="bidadariPreviewFile('{{ asset($sub->file_path) }}', '{{ addslashes($sub->file_original_name) }}')">{{ $sub->file_original_name }}</a>
                                             </div>
                                         @endif
                                     @else
@@ -82,7 +82,7 @@
                                             @if($sub && $sub->file_path)
                                                 <div class="small mt-1">
                                                     File saat ini:
-                                                    <a href="{{ asset($sub->file_path) }}" target="_blank">{{ $sub->file_original_name }}</a>
+                                                    <a href="javascript:void(0)" onclick="bidadariPreviewFile('{{ asset($sub->file_path) }}', '{{ addslashes($sub->file_original_name) }}')">{{ $sub->file_original_name }}</a>
                                                 </div>
                                             @endif
                                         @endif

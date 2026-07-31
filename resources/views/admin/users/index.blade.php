@@ -2,8 +2,21 @@
 @section('title', 'Kelola Akun User')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h6 class="text-muted mb-0">Daftar seluruh akun admin & user</h6>
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <form method="GET" class="d-flex gap-2 flex-wrap">
+        <input type="text" name="search" value="{{ $search ?? '' }}" class="form-control form-control-sm" placeholder="Cari nama / username / organisasi..." style="min-width: 260px;">
+        <select name="kategori" class="form-select form-select-sm" onchange="this.form.submit()">
+            <option value="">-- Semua Kategori --</option>
+            <option value="admin" {{ ($kategori ?? '') === 'admin' ? 'selected' : '' }}>Admin</option>
+            <option value="opd" {{ ($kategori ?? '') === 'opd' ? 'selected' : '' }}>OPD/Dinas</option>
+            <option value="kecamatan" {{ ($kategori ?? '') === 'kecamatan' ? 'selected' : '' }}>Kecamatan</option>
+            <option value="desa" {{ ($kategori ?? '') === 'desa' ? 'selected' : '' }}>Desa</option>
+        </select>
+        <button type="submit" class="btn btn-sm btn-outline-primary"><i class="bi bi-search"></i> Cari</button>
+        @if(($search ?? '') !== '' || ($kategori ?? '') !== '')
+            <a href="{{ route('admin.users.index') }}" class="btn btn-sm btn-outline-secondary">Reset</a>
+        @endif
+    </form>
     <a href="{{ route('admin.users.create') }}" class="btn btn-primary">
         <i class="bi bi-plus-lg me-1"></i> Tambah Akun
     </a>
@@ -47,7 +60,8 @@
                         <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-sm btn-outline-primary">
                             <i class="bi bi-pencil"></i>
                         </a>
-                        <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin hapus akun ini?')">
+                        <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="d-inline"
+                            onsubmit="return confirm('{{ $user->submissions_count > 0 ? '⚠️ PERINGATAN: Akun ini punya ' . $user->submissions_count . ' data yang udah diupload. Semua data itu bakal IKUT TERHAPUS PERMANEN kalau lanjut. Yakin mau hapus akun ini?' : 'Yakin hapus akun ini?' }}')">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-sm btn-outline-danger">
