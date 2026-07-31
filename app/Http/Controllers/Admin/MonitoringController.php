@@ -134,7 +134,7 @@ class MonitoringController extends Controller
      * Kalau ada data per-desa (khusus akun Kecamatan), dikelompokin ke subfolder
      * per desa biar gak campur aduk.
      */
-    public function downloadZip(User $user): Response|RedirectResponse
+    public function downloadZip(User $user)
     {
         $submissions = Submission::where('user_id', $user->id)
             ->whereNotNull('file_path')
