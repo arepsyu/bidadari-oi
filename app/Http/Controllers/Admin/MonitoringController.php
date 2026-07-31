@@ -138,7 +138,7 @@ class MonitoringController extends Controller
     {
         $submissions = Submission::where('user_id', $user->id)
             ->whereNotNull('file_path')
-            ->with(['pertanyaan', 'desa'])
+            ->with(['pertanyaan.indikator.klaster', 'desa'])
             ->orderBy('pertanyaan_id')
             ->get();
 
@@ -161,24 +161,39 @@ class MonitoringController extends Controller
         }
 
         $counter = 1;
+        $fallbackNo = 1;
+
         foreach ($submissions as $sub) {
             $fullPath = public_path($sub->file_path);
+            $pertanyaan = $sub->pertanyaan;
 
-            if (! file_exists($fullPath) || ! $sub->pertanyaan) {
+            if (! file_exists($fullPath) || ! $pertanyaan) {
                 continue;
             }
 
             $ext = pathinfo($sub->file_original_name ?? $sub->file_path, PATHINFO_EXTENSION) ?: 'dat';
-            $judul = Str::limit(Str::slug($sub->pertanyaan->teks, '-'), 60, '');
-            $namaFile = sprintf('%02d_%s.%s', $counter, $judul ?: 'dokumen', $ext);
+
+            // Nama file: pakai kode resmi pertanyaan ("Pertanyaan 5") biar nyambung sama
+            // dokumen KLA asli, plus judul singkat (4-5 kata pertama doang, biar gak kepanjangan)
+            $kode = $pertanyaan->kode ? Str::slug($pertanyaan->kode, '-') : 'dokumen-' . $fallbackNo++;
+            $judulSingkat = Str::slug(Str::words($pertanyaan->teks, 5, ''), '-');
+            $namaFile = sprintf('%s_%s.%s', $kode, $judulSingkat ?: 'lampiran', $ext);
+
+            // Folder: kelompokin per Klaster/Indikator biar konteksnya jelas dari struktur folder,
+            // bukan dari nama file yang jadi kepanjangan
+            $indikator = $pertanyaan->indikator;
+            $klasterNama = $indikator?->klaster?->nama ?? 'Lainnya';
+            $indikatorNama = $indikator?->kode ?? $indikator?->nama ?? 'Umum';
+
+            $folderKlasterIndikator = Str::slug($klasterNama, '-') . '/' . Str::slug($indikatorNama, '-');
 
             if ($sub->desa_id && $sub->desa) {
-                $folder = 'Desa - ' . Str::slug($sub->desa->nama, '-');
-                $zip->addFile($fullPath, $folder . '/' . $namaFile);
+                $folder = 'Desa - ' . Str::slug($sub->desa->nama, '-') . '/' . $folderKlasterIndikator;
             } else {
-                $zip->addFile($fullPath, $namaFile);
+                $folder = $folderKlasterIndikator;
             }
 
+            $zip->addFile($fullPath, $folder . '/' . $namaFile);
             $counter++;
         }
 
