@@ -124,7 +124,7 @@
 <div class="d-flex">
     <nav class="bo-sidebar d-flex flex-column flex-shrink-0" id="boSidebar" style="width: 260px;">
         <div class="brand d-flex align-items-center gap-2">
-            <img src="{{ asset('images/logo.png') }}" alt="Logo">
+            <img src="{{ asset('images/favicon.png') }}" alt="Logo">
             <div>
                 <div class="fw-bold" style="font-size: 1rem; line-height:1.1;">BIDADARI OI</div>
                 <div style="font-size:.65rem; opacity:.85; line-height:1.3;">Bank Informasi Data Kabupaten Layak Anak Terintegrasi Ogan Ilir</div>
