@@ -38,6 +38,10 @@ Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->n
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    // Profil Saya (ganti nama & foto, buat semua role)
+    Route::get('/profil', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profil', [ProfileController::class, 'update'])->name('profile.update');
+
     // Ganti password (buat semua role: admin, opd, kecamatan, desa)
     Route::get('/ganti-password', [ProfileController::class, 'editPassword'])->name('profile.password.edit');
     Route::put('/ganti-password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');

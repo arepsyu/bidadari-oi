@@ -12,6 +12,7 @@ class User extends Authenticatable
 
     protected $fillable = [
         'name',
+        'avatar',
         'username',
         'email',
         'password',
@@ -80,6 +81,17 @@ class User extends Authenticatable
             'desa' => 'Desa',
             default => '-',
         };
+    }
+
+    /**
+     * Inisial nama, buat avatar fallback kalau belum upload foto.
+     */
+    public function initials(): string
+    {
+        $words = preg_split('/\s+/', trim($this->name));
+        $initials = strtoupper(substr($words[0] ?? 'U', 0, 1) . substr($words[1] ?? '', 0, 1));
+
+        return $initials ?: 'U';
     }
 
     /**

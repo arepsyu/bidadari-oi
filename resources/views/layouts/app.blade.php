@@ -162,6 +162,9 @@
             @endif
         </div>
         <div class="p-3 logout-area">
+            <a href="{{ route('profile.edit') }}" class="btn btn-sm btn-outline-light w-100 mb-2">
+                <i class="bi bi-person-circle"></i> Profil Saya
+            </a>
             <a href="{{ route('profile.password.edit') }}" class="btn btn-sm btn-outline-light w-100 mb-2">
                 <i class="bi bi-key"></i> Ganti Password
             </a>
@@ -182,9 +185,20 @@
                 </button>
                 <h5 class="mb-0 text-bo-primary fw-bold">@yield('title', 'Dashboard')</h5>
             </div>
-            <div class="text-end">
-                <div class="fw-semibold">{{ auth()->user()->name }}</div>
-                <div class="small text-muted">{{ auth()->user()->organisasi ?? ucfirst(auth()->user()->role) }}</div>
+            <div class="d-flex align-items-center gap-2">
+                <a href="{{ route('profile.edit') }}" class="text-end text-decoration-none text-dark">
+                    <div class="fw-semibold">{{ auth()->user()->name }}</div>
+                    <div class="small text-muted">{{ auth()->user()->organisasi ?? ucfirst(auth()->user()->role) }}</div>
+                </a>
+                @if(auth()->user()->avatar)
+                    <img src="{{ asset(auth()->user()->avatar) }}" alt="Foto Profil"
+                         class="rounded-circle" style="width: 38px; height: 38px; object-fit: cover;">
+                @else
+                    <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold text-white flex-shrink-0"
+                         style="width: 38px; height: 38px; background: linear-gradient(135deg, var(--bo-primary), var(--bo-secondary)); font-size: .8rem;">
+                        {{ auth()->user()->initials() }}
+                    </div>
+                @endif
             </div>
         </div>
 
